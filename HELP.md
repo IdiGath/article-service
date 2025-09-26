@@ -1,7 +1,7 @@
 # Read Me First
 The following was discovered as part of building this project:
 
-* The original package name 'de.idigath.article-service' is invalid and this project uses 'de.idigath.article_service' instead.
+* The original package name 'de.idigath.article-service' is invalid and this project uses 'de.idigath.articleservice' instead.
 
 # Getting Started
 
