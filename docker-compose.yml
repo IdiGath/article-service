@@ -1,0 +1,21 @@
+networks:
+  blog-network:
+    driver: bridge
+
+services:
+  postgres:
+    image: "postgres"
+    container_name: "article-postgres" 
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata/article
+      POSTGRES_DB: article
+    volumes:
+      - /custom/mount:/var/lib/postgresql/data/article
+      - ./db:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    ports:
+      - "8085:5432"  
+    networks:
+      - blog-network  

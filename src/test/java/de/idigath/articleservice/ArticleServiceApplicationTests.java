@@ -1,4 +1,4 @@
-package de.idigath.article_service;
+package de.idigath.articleservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

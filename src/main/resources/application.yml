@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: article-service
+  datasource:  
+    url: jdbc:postgresql://localhost:8085/article
+    username: articleservice
+    password: ${JAVA_USER_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    properties:  
+      hibernate: 
+        format_sql: true
