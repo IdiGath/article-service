@@ -1,6 +1,6 @@
 spring:
   application:
-    name: article-service
+    name: articleservice
   datasource:  
     url: jdbc:postgresql://localhost:8085/article
     username: articleservice
