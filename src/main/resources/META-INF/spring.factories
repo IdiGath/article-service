@@ -1,6 +1,0 @@
-# This file is used by Spring Boot to discover and register custom components,
-# such as EnvironmentPostProcessors, that are not part of the standard Spring Boot
-# auto-configuration. In this case, it registers the DotenvEnvironmentPostProcessor,
-# which allows the application to load environment variables from a .env file.
-org.springframework.boot.env.EnvironmentPostProcessor=\
-de.idigath.articleservice.configuration.DotenvEnvironmentPostProcessor

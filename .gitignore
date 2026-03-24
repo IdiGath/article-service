@@ -1,4 +1,3 @@
-# ---> Java
 # Compiled class files
 *.class
 
@@ -32,6 +31,23 @@ pom.xml.versionsBackup
 pom.xml.next
 release.properties
 dependency-reduced-pom.xml
+.flattened-pom.xml
+
+# Vim
+*.swp
+*.swo
+
+# patch
+*.orig
+*.rej
+
+# Local environment
+.env
+
+# Plugin directory
+/.quarkus/cli/plugins/
+# TLS Certificates
+.certs/
 
 # Spring Boot specific
 spring.log
@@ -48,6 +64,7 @@ db/init.sql
 
 # VS Code
 .vscode/
+.factorypath
 
 # IntelliJ IDEA
 .idea/
@@ -63,6 +80,7 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+nb-configuration.xml
 
 # Eclipse
 .project
