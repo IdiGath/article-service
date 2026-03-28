@@ -1,0 +1,35 @@
+DO
+$$
+BEGIN
+	IF NOT EXISTS (
+		SELECT FROM pg_catalog.pg_roles WHERE rolname = 'articleservice'
+	)  THEN
+		CREATE ROLE articleservice LOGIN PASSWORD '${JAVA_USER_PASSWORD}';
+	END IF;
+END
+$$
+LANGUAGE plpgsql;
+
+
+CREATE TABLE IF NOT EXISTS public.articles (
+	id SERIAL PRIMARY KEY,
+	title VARCHAR(255) NOT NULL,
+	logo_url VARCHAR(255) NOT NULL,
+	summary VARCHAR(500) NOT NULL,
+	text_content TEXT NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS public.sources (
+	id SERIAL PRIMARY KEY,
+	article_id INTEGER NOT NULL,
+	title VARCHAR(255) NOT NULL,
+	url VARCHAR(255) NOT NULL,
+	CONSTRAINT fk_article
+		FOREIGN KEY (article_id)
+		REFERENCES public.articles(id)
+		ON  DELETE CASCADE
+);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO articleservice;
