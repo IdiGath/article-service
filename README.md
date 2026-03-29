@@ -1,5 +1,41 @@
 # article-service
 
+This project provides a backend service for managing blog articles.
+
+## Architecture
+The project consists of:
+- **PostgreSQL Database** (configuration in `./db` and `./docker-compose.yml`)
+- **Quarkus service** for data processing and REST API
+
+## Key Features
+- **Article storage** in PostgreSQL (Markdown format)
+- **CRUD operations** for articles
+- **REST API** for content access
+- **Markdown-to-HTML parsing** (converts stored Markdown to HTML before returning it to the client)
+
+## Workflow
+1. Articles are stored in the database as **Markdown**.
+2. The service parses Markdown into HTML on request.
+3. HTML is returned to the consumer via REST endpoints.
+
+## Getting Started
+
+//TODO
+
+# article-service
+
+This project manages blog articles.
+It consists of PostgreSQL Database, which specialization can be found in ./db and ./docker-compose.yml,
+and quarkus service to work with it.
+
+The main goals of this projects are:
+- data articles storage
+- CRUD-access to the data
+- REST-access to the contect
+
+All articles are stored in markdown form in the database.
+The service will parse the content and return in via REST as HTML to the consumer.
+
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
