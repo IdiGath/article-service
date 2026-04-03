@@ -22,6 +22,14 @@ The project consists of:
 
 //TODO
 
+## Testing
+
+Coverage reports are generated at `target/site/jacoco/index.html` after running:
+
+```bash
+./mvnw clean verify
+```
+
 # article-service
 
 This project manages blog articles.
