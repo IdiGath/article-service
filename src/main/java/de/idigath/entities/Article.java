@@ -1,10 +1,15 @@
 package de.idigath.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -41,4 +46,15 @@ public class Article extends PanacheEntity {
   @UpdateTimestamp
   @Column(name = "updated_at")
   public LocalDateTime updatedAt;
+
+  /**
+   * The Source set of the article. Defines the {@link OneToMany} relationship. Cascades deletion:
+   * if the article is deleted, all its sources are removed automatically.
+   */
+  @OneToMany(
+      mappedBy = "article",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  public Set<Source> sources = new HashSet<>();
 }
