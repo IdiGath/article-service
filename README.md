@@ -22,6 +22,11 @@ The project consists of:
 
 //TODO
 
+## Sources that were useful
+- [Simplified Hibernate ORM with Panache](https://quarkus.io/guides/hibernate-orm-panache)
+- [Validation with Hibernate Validator](https://quarkus.io/guides/validation)
+- [Configure data sources in Quarkus](https://quarkus.io/guides/datasource)
+
 ## Testing
 
 Coverage reports are generated at `target/site/jacoco/index.html` after running:
