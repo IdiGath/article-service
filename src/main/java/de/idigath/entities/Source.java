@@ -11,8 +11,7 @@ import jakarta.persistence.Table;
 /**
  * Source of information referenced in an article, including URL and citation details.
  *
- * <p>Extends {@link PanacheEntity} for automatic ID management and CRUD operations. Timestamps are
- * auto filled by Hibernate.
+ * <p>Extends {@link PanacheEntity} for automatic ID management and CRUD operations.
  *
  * <p>Each source belongs to exactly one article. This design assumes that the same source (with
  * identical URL and citation) is unlikely to be reused across multiple articles, simplifying the
