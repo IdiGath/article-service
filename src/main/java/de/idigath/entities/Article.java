@@ -5,6 +5,9 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -50,7 +53,7 @@ public class Article extends PanacheEntity {
   public LocalDateTime updatedAt;
 
   /**
-   * The Source set of the article. Defines the {@link OneToMany} relationship. Cascades deletion:
+   * The source set of the article. Defines the {@link OneToMany} relationship. Cascades deletion:
    * if the article is deleted, all its sources are removed automatically.
    */
   @OneToMany(
@@ -59,4 +62,12 @@ public class Article extends PanacheEntity {
       cascade = CascadeType.ALL,
       orphanRemoval = true)
   public Set<Source> sources = new HashSet<>();
+
+  /** The tag set of the article. Defines the {@link ManyToMany} relationship. */
+  @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+  @JoinTable(
+      name = "article_tags",
+      joinColumns = @JoinColumn(name = "article_id"),
+      inverseJoinColumns = @JoinColumn(name = "tag_id"))
+  public Set<Tag> tags = new HashSet<>();
 }
