@@ -24,17 +24,19 @@ import org.hibernate.annotations.UpdateTimestamp;
 public class Article extends PanacheEntity {
 
   /** Article title to display at the beginning of the article and in the article list. */
+  @Column(length = 255, nullable = false)
   public String title;
 
   /** Each article has a logo picture. This argument contains the path to the image service */
-  @Column(name = "logo_url")
+  @Column(length = 255, nullable = false, name = "logo_url")
   public String logoUrl;
 
   /** Each article has a preview and it contains a short summary of the content. */
+  @Column(length = 500, nullable = false)
   public String summary;
 
   /** Content auf the article in markdown format.. */
-  @Column(name = "text_content")
+  @Column(nullable = false, columnDefinition = "TEXT", name = "text_content")
   public String textContent;
 
   /** Automaticly generated creation date. */

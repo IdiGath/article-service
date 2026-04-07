@@ -1,6 +1,7 @@
 package de.idigath.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -30,11 +31,14 @@ public class Source extends PanacheEntity {
   public Article article;
 
   /** Source title to desplay at the sources list in the end of the article. */
+  @Column(length = 255, nullable = false)
   public String title;
 
   /** Url to the online Source. */
+  @Column(length = 255, nullable = false)
   public String url;
 
   /** Citation information like chapter or line. */
+  @Column(nullable = false, columnDefinition = "TEST")
   public String citation;
 }
