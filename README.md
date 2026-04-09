@@ -26,6 +26,7 @@ The project consists of:
 - [Simplified Hibernate ORM with Panache](https://quarkus.io/guides/hibernate-orm-panache)
 - [Validation with Hibernate Validator](https://quarkus.io/guides/validation)
 - [Configure data sources in Quarkus](https://quarkus.io/guides/datasource)
+- [Writing REST Services with Quarkus REST (formerly RESTEasy Reactive)](https://quarkus.io/guides/rest)
 
 ## Testing
 
