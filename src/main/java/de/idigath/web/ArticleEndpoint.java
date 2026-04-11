@@ -1,6 +1,10 @@
 package de.idigath.web;
 
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -12,7 +16,19 @@ public class ArticleEndpoint {
   @GET
   @Path("/{id}")
   @Produces(MediaType.TEXT_PLAIN)
-  public String hello(@PathParam("id") int id) {
+  public String getArticle(@PathParam("id") int id) {
     return "Hello from Quarkus REST that is my ID: " + id;
   }
+
+  @POST
+  @Consumes(MediaType.APPLICATION_JSON)
+  public void addArticle() {}
+
+  @DELETE
+  @Path("/{id}")
+  public void deleteArticle(@PathParam("id") int id) {}
+
+  @PUT
+  @Path("/{id}")
+  public void editArticle(@PathParam("id") int id) {}
 }
