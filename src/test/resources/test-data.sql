@@ -31,37 +31,37 @@ INSERT INTO public.articles (title, logo_url, summary, text_content, created_at,
 '# PostgreSQL: Query Optimization\n\n## Indexes\n- Create indexes for frequently used fields.\n\n## Execution Plans\n- Use `EXPLAIN ANALYZE` to analyze queries.\n\n## Monitoring\n- Set up `pg_stat_statements` to track slow queries.',
 '2026-04-05 14:00:00', '2026-04-05 14:00:00');
 
--- Insert sources
+
 INSERT INTO public.sources (article_id, title, url, citation) VALUES
-(1, 'Microservices.io', 'https://microservices.io/', 'Chris Richardson, Microservices.io, 2023'),
-(1, 'Martin Fowler: Microservices', 'https://martinfowler.com/articles/microservices.html', 'Martin Fowler, Microservices, 2014'),
-(2, 'Oracle: Java 21 Release Notes', 'https://www.oracle.com/java/technologies/javase/21-relnote-issues.html', 'Oracle, Java 21 Release Notes, 2023'),
-(2, 'Java 21 Features - Baeldung', 'https://www.baeldung.com/java-21-features', 'Baeldung, Java 21 Features, 2023'),
-(3, 'NixOS Manual', 'https://nixos.org/manual/', 'NixOS Contributors, NixOS Manual, 2024'),
-(3, 'Nixvim GitHub', 'https://github.com/nix-community/nixvim', 'Nix Community, Nixvim, 2024'),
-(4, 'Quarkus Official Guide', 'https://quarkus.io/guides/', 'Red Hat, Quarkus Guides, 2024'),
-(4, 'Spring Boot Documentation', 'https://spring.io/projects/spring-boot', 'VMware, Spring Boot Docs, 2024'),
-(5, 'PostgreSQL Official Docs', 'https://www.postgresql.org/docs/', 'PostgreSQL Global Development Group, PostgreSQL Docs, 2024'),
-(5, 'Use The Index, Luke', 'https://use-the-index-luke.com/', 'Markus Winand, Use The Index, Luke, 2023');
+(51, 'Microservices.io', 'https://microservices.io/', 'Chris Richardson, Microservices.io, 2023'),
+(51, 'Martin Fowler: Microservices', 'https://martinfowler.com/articles/microservices.html', 'Martin Fowler, Microservices, 2014'),
+(101, 'Oracle: Java 21 Release Notes', 'https://www.oracle.com/java/technologies/javase/21-relnote-issues.html', 'Oracle, Java 21 Release Notes, 2023'),
+(101, 'Java 21 Features - Baeldung', 'https://www.baeldung.com/java-21-features', 'Baeldung, Java 21 Features, 2023'),
+(151, 'NixOS Manual', 'https://nixos.org/manual/', 'NixOS Contributors, NixOS Manual, 2024'),
+(151, 'Nixvim GitHub', 'https://github.com/nix-community/nixvim', 'Nix Community, Nixvim, 2024'),
+(201, 'Quarkus Official Guide', 'https://quarkus.io/guides/', 'Red Hat, Quarkus Guides, 2024'),
+(201, 'Spring Boot Documentation', 'https://spring.io/projects/spring-boot', 'VMware, Spring Boot Docs, 2024'),
+(251, 'PostgreSQL Official Docs', 'https://www.postgresql.org/docs/', 'PostgreSQL Global Development Group, PostgreSQL Docs, 2024'),
+(251, 'Use The Index, Luke', 'https://use-the-index-luke.com/', 'Markus Winand, Use The Index, Luke, 2023');
 
 -- Insert article_tags (links between articles and tags)
 INSERT INTO public.article_tags (article_id, tag_id) VALUES
-(1, (SELECT id FROM public.tags WHERE name = 'Microservices')),
-(1, (SELECT id FROM public.tags WHERE name = 'DevOps')),
-(1, (SELECT id FROM public.tags WHERE name = 'Cloud')),
+(51, (SELECT id FROM public.tags WHERE name = 'Microservices')),
+(51, (SELECT id FROM public.tags WHERE name = 'DevOps')),
+(51, (SELECT id FROM public.tags WHERE name = 'Cloud')),
 
-(2, (SELECT id FROM public.tags WHERE name = 'Java')),
-(2, (SELECT id FROM public.tags WHERE name = 'Performance')),
+(101, (SELECT id FROM public.tags WHERE name = 'Java')),
+(101, (SELECT id FROM public.tags WHERE name = 'Performance')),
 
-(3, (SELECT id FROM public.tags WHERE name = 'Java')),
-(3, (SELECT id FROM public.tags WHERE name = 'NixOS')),
-(3, (SELECT id FROM public.tags WHERE name = 'DevOps')),
+(151, (SELECT id FROM public.tags WHERE name = 'Java')),
+(151, (SELECT id FROM public.tags WHERE name = 'NixOS')),
+(151, (SELECT id FROM public.tags WHERE name = 'DevOps')),
 
-(4, (SELECT id FROM public.tags WHERE name = 'Quarkus')),
-(4, (SELECT id FROM public.tags WHERE name = 'Spring Boot')),
-(4, (SELECT id FROM public.tags WHERE name = 'Cloud')),
-(4, (SELECT id FROM public.tags WHERE name = 'Java')),
+(201, (SELECT id FROM public.tags WHERE name = 'Quarkus')),
+(201, (SELECT id FROM public.tags WHERE name = 'Spring Boot')),
+(201, (SELECT id FROM public.tags WHERE name = 'Cloud')),
+(201, (SELECT id FROM public.tags WHERE name = 'Java')),
 
-(5, (SELECT id FROM public.tags WHERE name = 'PostgreSQL')),
-(5, (SELECT id FROM public.tags WHERE name = 'Database')),
-(5, (SELECT id FROM public.tags WHERE name = 'Performance'));
+(251, (SELECT id FROM public.tags WHERE name = 'PostgreSQL')),
+(251, (SELECT id FROM public.tags WHERE name = 'Database')),
+(251, (SELECT id FROM public.tags WHERE name = 'Performance'));

@@ -1,55 +1,66 @@
 DO
 $$
 BEGIN
-	IF NOT EXISTS (
-		SELECT FROM pg_catalog.pg_roles WHERE rolname = 'articleservice'
-	)  THEN
-		CREATE ROLE articleservice LOGIN PASSWORD '${JAVA_USER_PASSWORD}';
-	END IF;
+    IF NOT EXISTS (
+        SELECT FROM pg_catalog.pg_roles WHERE rolname = 'articleservice'
+    ) THEN
+        CREATE ROLE articleservice LOGIN PASSWORD '${JAVA_USER_PASSWORD}';
+    END IF;
 END
 $$
 LANGUAGE plpgsql;
 
-
 CREATE TABLE IF NOT EXISTS public.articles (
-	id SERIAL PRIMARY KEY,
-	title VARCHAR(255) NOT NULL,
-	logo_url VARCHAR(255) NOT NULL,
-	summary VARCHAR(500) NOT NULL,
-	text_content TEXT NOT NULL,
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id BIGINT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    logo_url VARCHAR(255) NOT NULL,
+    summary VARCHAR(500) NOT NULL,
+    text_content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS public.sources (
-	id SERIAL PRIMARY KEY,
-	article_id INTEGER NOT NULL,
-	title VARCHAR(255) NOT NULL,
-	url VARCHAR(255) NOT NULL,
-	citation TEXT NOT NULL,
-	CONSTRAINT fk_article
-		FOREIGN KEY (article_id)
-		REFERENCES public.articles(id)
-		ON DELETE CASCADE
+    id BIGINT PRIMARY KEY,
+    article_id BIGINT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    url VARCHAR(255) NOT NULL,
+    citation TEXT NOT NULL,
+    CONSTRAINT fk_article
+        FOREIGN KEY (article_id)
+        REFERENCES public.articles(id)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS public.tags (
-	id SERIAL PRIMARY KEY,
-	name VARCHAR(100) NOT NULL UNIQUE
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS public.article_tags (
-	article_id INTEGER NOT NULL,
-	tag_id INTEGER NOT NULL,
-	CONSTRAINT fk_article
-		FOREIGN KEY (article_id)
-		REFERENCES public.articles(id)
-		ON DELETE CASCADE,
-	CONSTRAINT fk_tags
-		FOREIGN KEY (tag_id)
-		REFERENCES public.tags(id)
-		ON DELETE CASCADE
+    article_id BIGINT NOT NULL,
+    tag_id BIGINT NOT NULL,
+    CONSTRAINT fk_article
+        FOREIGN KEY (article_id)
+        REFERENCES public.articles(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_tags
+        FOREIGN KEY (tag_id)
+        REFERENCES public.tags(id)
+        ON DELETE CASCADE
 );
+
+CREATE SEQUENCE IF NOT EXISTS public.articles_SEQ INCREMENT BY 50 OWNED BY public.articles.id;
+CREATE SEQUENCE IF NOT EXISTS public.sources_SEQ INCREMENT BY 50 OWNED BY public.sources.id;
+CREATE SEQUENCE IF NOT EXISTS public.tags_SEQ INCREMENT BY 50 OWNED BY public.tags.id;
+
+SELECT setval('public.articles_SEQ', COALESCE((SELECT MAX(id) FROM public.articles), 1));
+SELECT setval('public.sources_SEQ', COALESCE((SELECT MAX(id) FROM public.sources), 1));
+SELECT setval('public.tags_SEQ', COALESCE((SELECT MAX(id) FROM public.tags), 1));
+
+ALTER TABLE public.articles ALTER COLUMN id SET DEFAULT nextval('public.articles_SEQ');
+ALTER TABLE public.sources ALTER COLUMN id SET DEFAULT nextval('public.sources_SEQ');
+ALTER TABLE public.tags ALTER COLUMN id SET DEFAULT nextval('public.tags_SEQ');
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO articleservice;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO articleservice;
