@@ -1,6 +1,7 @@
 package de.idigath.model;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 public record ArticleDto(
     String title,
@@ -8,4 +9,6 @@ public record ArticleDto(
     String summary,
     String textContent,
     LocalDateTime createdAt,
-    LocalDateTime updatedAt) {}
+    LocalDateTime updatedAt,
+    Set<SourceDto> sources,
+    Set<TagDto> tags) {}

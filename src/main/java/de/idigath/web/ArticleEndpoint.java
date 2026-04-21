@@ -14,6 +14,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.math.BigInteger;
 
+/** This endoint contains all CRUD-Operations for the article database. */
 @Path("/api/articles")
 public class ArticleEndpoint {
 
@@ -23,7 +24,7 @@ public class ArticleEndpoint {
   public ArticleDto getArticle(@PathParam("id") BigInteger id) {
     System.out.println(Article.findById(id).toString());
     Article article = Article.findById(id);
-    ArticleDto result = ArticleMapper.INSTANCE.ArticleToArticleDto(article);
+    ArticleDto result = ArticleMapper.INSTANCE.articleToArticleDto(article);
     return result;
   }
 
@@ -37,5 +38,6 @@ public class ArticleEndpoint {
 
   @PUT
   @Path("/{id}")
+  @Consumes(MediaType.APPLICATION_JSON)
   public void editArticle(@PathParam("id") int id) {}
 }
