@@ -14,15 +14,23 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.math.BigInteger;
 
-/** This endoint contains all CRUD-Operations for the article database. */
+/**
+ * RESTful endpoint for managing articles and related entities. Provides CRUD operations for
+ * articles. Also supports operations with associated entities such as sources and tags.
+ */
 @Path("/api/articles")
 public class ArticleEndpoint {
 
+  /**
+   * Retrieves the article by its unique identifier.
+   *
+   * @param id the unique identifier of the article
+   * @return Article in json-format
+   */
   @GET
   @Path("/{id}")
   @Produces(MediaType.APPLICATION_JSON)
   public ArticleDto getArticle(@PathParam("id") BigInteger id) {
-    System.out.println(Article.findById(id).toString());
     Article article = Article.findById(id);
     ArticleDto result = ArticleMapper.INSTANCE.articleToArticleDto(article);
     return result;
@@ -32,6 +40,11 @@ public class ArticleEndpoint {
   @Consumes(MediaType.APPLICATION_JSON)
   public void addArticle() {}
 
+  /**
+   * Deletes the article by its unique identifier.
+   *
+   * @param id the unique identifier of the article
+   */
   @DELETE
   @Path("/{id}")
   public void deleteArticle(@PathParam("id") int id) {}
