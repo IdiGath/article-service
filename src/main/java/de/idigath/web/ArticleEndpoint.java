@@ -12,9 +12,16 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.UriInfo;
 import java.math.BigInteger;
-import java.util.Set;
+import java.net.URI;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.List;
+import org.jboss.resteasy.reactive.RestResponse;
 
 /**
  * RESTful endpoint for managing articles and related entities. Provides CRUD operations for
@@ -32,10 +39,10 @@ public class ArticleEndpoint {
   @GET
   @Path("/{id}")
   @Produces(MediaType.APPLICATION_JSON)
-  public ArticleDto getArticle(@PathParam("id") BigInteger id) {
+  public RestResponse<ArticleDto> getArticle(@PathParam("id") BigInteger id) {
     Article article = Article.findById(id);
     ArticleDto result = ArticleMapper.INSTANCE.articleToArticleDto(article);
-    return result;
+    return RestResponse.ok(result);
   }
 
   /**
@@ -46,32 +53,57 @@ public class ArticleEndpoint {
    * @param query the text query (including regex) to search for in article titles. If {@code null}
    *     or empty, this parameter is ignored.
    * @param tag the tag to filter articles. If {@code null} or empty, this parameter is ignored.
-   * @return a set of {@link ArticleDto} objects matching the search criteria. Returns an empty set
+   * @return a list of {@link ArticleDto} objects matching the search criteria. Returns an empty set
    *     if no articles are found.
    */
   @GET
   @Path("/search")
   @Produces(MediaType.APPLICATION_JSON)
-  public Set<ArticleDto> searchArticle(
+  public RestResponse<List<ArticleDto>> searchArticle(
       @QueryParam("query") String query, @QueryParam("tag") String tag) {
     return null;
   }
 
+  /**
+   * Creates a new article in the database. After resource creation responses with the URI to the
+   * new Resource.
+   *
+   * @param article new article from the api consumer
+   * @param uriinfo information to the current URI
+   * @return HTTP-Status 201 with location in the happy case
+   */
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
-  public void addArticle() {}
+  public RestResponse<Void> addArticle(ArticleDto article, @Context UriInfo uriinfo) {
+    URI location = uriinfo.getAbsolutePathBuilder().path("42").build();
+    return RestResponse.created(location);
+  }
 
   /**
    * Deletes the article by its unique identifier.
    *
    * @param id the unique identifier of the article
+   * @return HTTP-Satus 204 in happy case
    */
   @DELETE
   @Path("/{id}")
-  public void deleteArticle(@PathParam("id") int id) {}
+  public RestResponse<Void> deleteArticle(@PathParam("id") int id) {
 
+    return RestResponse.noContent();
+  }
+
+  /**
+   * Updates current article with the new version from the body.
+   *
+   * @param id the unique identifier of the article
+   * @param article new version of the article
+   * @return HTTP-Satus 200 with modified time and updated article version in body
+   */
   @PUT
   @Path("/{id}")
   @Consumes(MediaType.APPLICATION_JSON)
-  public void editArticle(@PathParam("id") int id) {}
+  public RestResponse<ArticleDto> editArticle(@PathParam("id") int id, ArticleDto article) {
+    Date lastModified = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
+    return RestResponse.ResponseBuilder.ok(article).lastModified(lastModified).build();
+  }
 }
