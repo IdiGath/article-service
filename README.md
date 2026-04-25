@@ -30,6 +30,7 @@ The project consists of:
 - [Mapstruct](https://mapstruct.org/)
 - [Jackson serialization support for Quarkus REST](https://quarkus.io/guides/rest#json-serialisation)
 - [Connect to the PostgreSQL database via JDBC](https://quarkus.io/guides/datasource)
+- [Using OpenAPI and Swagger UI in Quarkus](https://quarkus.io/guides/openapi-swaggerui)
 
 ## Testing
 
