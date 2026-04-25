@@ -11,8 +11,10 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import java.math.BigInteger;
+import java.util.Set;
 
 /**
  * RESTful endpoint for managing articles and related entities. Provides CRUD operations for
@@ -25,7 +27,7 @@ public class ArticleEndpoint {
    * Retrieves the article by its unique identifier.
    *
    * @param id the unique identifier of the article
-   * @return Article in json-format
+   * @return Article {@link ArticleDto} in json-format
    */
   @GET
   @Path("/{id}")
@@ -34,6 +36,25 @@ public class ArticleEndpoint {
     Article article = Article.findById(id);
     ArticleDto result = ArticleMapper.INSTANCE.articleToArticleDto(article);
     return result;
+  }
+
+  /**
+   * Searches for articles based on the provided query and/or tag. The search can be performed using
+   * a text query (including regex), a tag, or both. If no articles match the criteria, an empty set
+   * is returned.
+   *
+   * @param query the text query (including regex) to search for in article titles. If {@code null}
+   *     or empty, this parameter is ignored.
+   * @param tag the tag to filter articles. If {@code null} or empty, this parameter is ignored.
+   * @return a set of {@link ArticleDto} objects matching the search criteria. Returns an empty set
+   *     if no articles are found.
+   */
+  @GET
+  @Path("/search")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Set<ArticleDto> searchArticle(
+      @QueryParam("query") String query, @QueryParam("tag") String tag) {
+    return null;
   }
 
   @POST
