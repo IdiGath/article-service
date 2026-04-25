@@ -25,6 +25,7 @@ The project consists of:
 ## OpenAPI
 - Swagger-UI: http://localhost:8080/q/swagger-ui/
 - OpenAPI-Spec: http://localhost:8080/q/openapi
+- OpenAPI-Spec in JSON: http://localhost:8080/q/openapi?format=json
 
 ## Sources that were useful
 - [Simplified Hibernate ORM with Panache](https://quarkus.io/guides/hibernate-orm-panache)
