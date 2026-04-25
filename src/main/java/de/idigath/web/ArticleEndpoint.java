@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.reactive.RestResponse;
 
 /**
@@ -28,6 +29,7 @@ import org.jboss.resteasy.reactive.RestResponse;
  * articles. Also supports operations with associated entities such as sources and tags.
  */
 @Path("/api/articles")
+@Tag(name = "Articles", description = "Articles operations.")
 public class ArticleEndpoint {
 
   /**

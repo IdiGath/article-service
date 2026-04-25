@@ -22,6 +22,10 @@ The project consists of:
 
 //TODO
 
+## OpenAPI
+- Swagger-UI: http://localhost:8080/q/swagger-ui/
+- OpenAPI-Spec: http://localhost:8080/q/openapi
+
 ## Sources that were useful
 - [Simplified Hibernate ORM with Panache](https://quarkus.io/guides/hibernate-orm-panache)
 - [Validation with Hibernate Validator](https://quarkus.io/guides/validation)
