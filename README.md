@@ -36,6 +36,8 @@ The project consists of:
 - [Jackson serialization support for Quarkus REST](https://quarkus.io/guides/rest#json-serialisation)
 - [Connect to the PostgreSQL database via JDBC](https://quarkus.io/guides/datasource)
 - [Using OpenAPI and Swagger UI in Quarkus](https://quarkus.io/guides/openapi-swaggerui)
+- [Testing Your Application in Quarkus](https://quarkus.io/guides/getting-started-testing)
+- [Continuous Testing in Quarkus](https://quarkus.io/guides/continuous-testing)
 
 ## Testing
 
