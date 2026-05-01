@@ -38,6 +38,7 @@ The project consists of:
 - [Using OpenAPI and Swagger UI in Quarkus](https://quarkus.io/guides/openapi-swaggerui)
 - [Testing Your Application in Quarkus](https://quarkus.io/guides/getting-started-testing)
 - [Continuous Testing in Quarkus](https://quarkus.io/guides/continuous-testing)
+- [Using liquibase in Quarkus](https://quarkus.io/guides/liquibase)
 
 ## Testing
 
