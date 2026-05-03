@@ -39,6 +39,7 @@ The project consists of:
 - [Testing Your Application in Quarkus](https://quarkus.io/guides/getting-started-testing)
 - [Continuous Testing in Quarkus](https://quarkus.io/guides/continuous-testing)
 - [Using liquibase in Quarkus](https://quarkus.io/guides/liquibase)
+- [Development and Testing of Quarkus applications using Testcontainers](https://testcontainers.com/guides/development-and-testing-quarkus-application-using-testcontainers)
 
 ## Testing
 
