@@ -1,0 +1,23 @@
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'containeradmin') THEN
+        CREATE ROLE containeradmin WITH LOGIN PASSWORD 'devadminpwd';
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'articleservice') THEN
+        CREATE ROLE articleservice WITH LOGIN PASSWORD 'devpwd';
+    END IF;
+END $$;
+
+-- GRANT-ы можно выполнять многократно, они безопасны
+GRANT USAGE, CREATE ON SCHEMA public TO containeradmin;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO containeradmin;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO containeradmin;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO containeradmin;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT USAGE, SELECT ON SEQUENCES TO containeradmin;
