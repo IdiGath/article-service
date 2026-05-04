@@ -1,18 +1,17 @@
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'containeradmin') THEN
-        CREATE ROLE containeradmin WITH LOGIN PASSWORD 'devadminpwd';
+        CREATE ROLE containeradmin WITH LOGIN PASSWORD '${DEV_LIQUIBASE_USER_PWD}';
     END IF;
 END $$;
 
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'articleservice') THEN
-        CREATE ROLE articleservice WITH LOGIN PASSWORD 'devpwd';
+        CREATE ROLE articleservice WITH LOGIN PASSWORD '${DEV_ARTICLE_SERVICE_USER_PWD}';
     END IF;
 END $$;
 
--- GRANT-ы можно выполнять многократно, они безопасны
 GRANT USAGE, CREATE ON SCHEMA public TO containeradmin;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO containeradmin;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO containeradmin;

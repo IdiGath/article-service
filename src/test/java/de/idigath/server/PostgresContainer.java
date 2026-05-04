@@ -18,7 +18,8 @@ public class PostgresContainer implements QuarkusTestResourceLifecycleManager {
             .withDatabaseName("article-test")
             .withUsername("postgres")
             .withPassword("postgres")
-            .withInitScript("db/init-test-user.sql");
+            .withInitScript("db/target/init-test-user.sql")
+            .withReuse(false);
 
     postgres.start();
 
