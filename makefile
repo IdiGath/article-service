@@ -3,7 +3,7 @@ ENVIRONMENT ?= dev
 DEV_TEMPLATE := ./src/main/resources/db/dev/templates/init-dev-user-template.sql
 DEV_OUTPUT := ./src/main/resources/db/dev/target/init-dev-user.sql
 
-.PHONY: init generate-init-sql build test up down full run
+.PHONY: init generate-testcontainer-sql clean-testcontainer-sql build test up down full run
 init:
 	@if [ -z "$(CONTAINER_ENGINE)" ]; then \
 		echo "🐳 Which container engine should be used?"; \
@@ -16,16 +16,6 @@ init:
 			*) echo "❌ Wrong choice"; exit 1;; \
 		esac; \
 		export CONTAINER_ENGINE; \
-	fi
-
-generate-init-sql:
-	@if [ "$(ENVIRONMENT)" = "prod" ]; then \
-		mkdir -p ./db/target; \
-		envsubst < ./db/init.sql.template > ./db/target/init.sql; \
-	else \
-		set -a && source ./.env && set +a && \
-		mkdir -p ./db/target; \
-		envsubst < ./db/init.sql.template > ./db/target/init.sql; \
 	fi
 
 generate-testcontainer-sql:
