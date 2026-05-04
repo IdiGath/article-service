@@ -7,13 +7,12 @@ services:
     image: "postgres:latest"
     container_name: "article-postgres"
     environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PWD}
       POSTGRES_USER: postgres
       POSTGRES_DB: article
       PGDATA: /var/lib/postgresql/data/pgdata/article
     volumes:
       - /custom/mount:/var/lib/postgresql/data/article
-      - ./db/target:/docker-entrypoint-initdb.d
     restart: unless-stopped
     ports:
       - "8085:5432"

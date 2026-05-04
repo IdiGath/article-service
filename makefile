@@ -2,8 +2,6 @@
 ENVIRONMENT ?= dev
 DEV_TEMPLATE := ./src/main/resources/db/dev/templates/init-dev-user-template.sql
 DEV_OUTPUT := ./src/main/resources/db/dev/target/init-dev-user.sql
-TEST_TEMPLATE := ./src/test/resources/db/templates/init-test-user-template.sql
-TEST_OUTPUT :=  ./src/test/resources/db/target/init-test-user.sql
 
 .PHONY: init generate-init-sql build test up down full run
 init:
@@ -30,17 +28,15 @@ generate-init-sql:
 		envsubst < ./db/init.sql.template > ./db/target/init.sql; \
 	fi
 
-generate-dev-test-sql:
+generate-testcontainer-sql:
 	@set -a; \
 	. ./.env; \
 	set +a; \
 	mkdir -p $(dir $(DEV_OUTPUT)); \
-	envsubst < $(DEV_TEMPLATE) > $(DEV_OUTPUT); \
-	mkdir -p $(dir $(TEST_OUTPUT)); \
-	envsubst < $(TEST_TEMPLATE) > $(TEST_OUTPUT)
+	envsubst < $(DEV_TEMPLATE) > $(DEV_OUTPUT);
 
-clean-dev-test-sql:
-	@rm -f $(DEV_OUTPUT) $(TEST_OUTPUT) 2>/dev/null || true
+clean-testcontainer-sql:
+	@rm -f $(DEV_OUTPUT) 2>/dev/null || true
 	@echo "🧹 Cleaned up generated SQL files"
 
 up:
