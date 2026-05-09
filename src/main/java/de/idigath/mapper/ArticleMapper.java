@@ -1,6 +1,6 @@
-package de.idigath.mappers;
+package de.idigath.mapper;
 
-import de.idigath.entities.Article;
+import de.idigath.entity.Article;
 import de.idigath.model.ArticleDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

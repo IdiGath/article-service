@@ -1,7 +1,7 @@
 package de.idigath.web;
 
-import de.idigath.entities.Article;
-import de.idigath.mappers.ArticleMapper;
+import de.idigath.entity.Article;
+import de.idigath.mapper.ArticleMapper;
 import de.idigath.model.ArticleDto;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;

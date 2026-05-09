@@ -1,4 +1,4 @@
-package de.idigath.entities;
+package de.idigath.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
