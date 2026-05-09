@@ -42,4 +42,4 @@ build:
 down:
 	@[ "$(CONTAINER_ENGINE)" = "podman" ] && podman-compose down || docker compose down
 
-full: init generate-init-sql up build
+full: init up build
