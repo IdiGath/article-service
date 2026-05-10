@@ -24,7 +24,12 @@ public class ArticleEndpointTest {
    * valid article ID.
    */
   @Test
-  public void testGetArticleHappyCase() {
+  public void testGetArticleHappyCase200() {
     when().get("/" + "151").then().statusCode(200);
+  }
+
+  @Test
+  public void testGetArticleWrongNumber() {
+    when().get("/" + "9999999").then().statusCode(200);
   }
 }
