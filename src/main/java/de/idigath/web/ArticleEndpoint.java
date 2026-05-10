@@ -6,6 +6,7 @@ import de.idigath.model.ArticleDto;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -21,6 +22,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.reactive.RestResponse;
 
@@ -43,6 +45,9 @@ public class ArticleEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   public RestResponse<ArticleDto> getArticle(@PathParam("id") BigInteger id) {
     Article article = Article.findById(id);
+    if (Objects.isNull(article)) {
+      throw new NotFoundException("Article with id: " + id + " not found");
+    }
     ArticleDto result = ArticleMapper.INSTANCE.articleToArticleDto(article);
     return RestResponse.ok(result);
   }

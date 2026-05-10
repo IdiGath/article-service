@@ -30,6 +30,6 @@ public class ArticleEndpointTest {
 
   @Test
   public void testGetArticleWrongNumber() {
-    when().get("/" + "9999999").then().statusCode(200);
+    when().get("/" + "9999999").then().statusCode(404);
   }
 }
