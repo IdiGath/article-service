@@ -22,7 +22,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.reactive.RestResponse;
 
@@ -44,10 +43,9 @@ public class ArticleEndpoint {
   @Path("/{id}")
   @Produces(MediaType.APPLICATION_JSON)
   public RestResponse<ArticleDto> getArticle(@PathParam("id") BigInteger id) {
-    Article article = Article.findById(id);
-    if (Objects.isNull(article)) {
-      throw new NotFoundException("Article with id: " + id + " not found");
-    }
+    var article =
+        Article.<Article>findByIdOptional(id)
+            .orElseThrow(() -> new NotFoundException("Article with id: " + id + " not found"));
     ArticleDto result = ArticleMapper.INSTANCE.articleToArticleDto(article);
     return RestResponse.ok(result);
   }

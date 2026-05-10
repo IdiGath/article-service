@@ -19,17 +19,18 @@ import org.junit.jupiter.api.Test;
 @TestHTTPEndpoint(ArticleEndpoint.class)
 public class ArticleEndpointTest {
 
-  /**
-   * Tests the successful retrieval of an article by its ID. Expects HTTP status code 200 (OK) for a
-   * valid article ID.
-   */
   @Test
   public void testGetArticleHappyCase200() {
     when().get("/" + "151").then().statusCode(200);
   }
 
   @Test
-  public void testGetArticleWrongNumber() {
+  public void testGetArticleWrongNumberNotFound404() {
     when().get("/" + "9999999").then().statusCode(404);
+  }
+
+  @Test
+  public void testGetArticleNotNumberBadRequest400() {
+    when().get("/" + "123A").then().statusCode(400);
   }
 }
