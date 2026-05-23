@@ -17,6 +17,7 @@
     <skipITs>true</skipITs>
     <surefire-plugin.version>3.5.4</surefire-plugin.version>
     <jacoco.version>0.8.14</jacoco.version>
+    <xml-bind.version>4.0.2</xml-bind.version>
     <org.mapstruct.version>1.6.3</org.mapstruct.version>
   </properties>
   <dependencyManagement>
@@ -85,7 +86,12 @@
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
-      <version>4.0.2</version>
+      <version>${xml-bind.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-junit-mockito</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

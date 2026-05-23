@@ -40,6 +40,7 @@ The project consists of:
 - [Continuous Testing in Quarkus](https://quarkus.io/guides/continuous-testing)
 - [Using liquibase in Quarkus](https://quarkus.io/guides/liquibase)
 - [Development and Testing of Quarkus applications using Testcontainers](https://testcontainers.com/guides/development-and-testing-quarkus-application-using-testcontainers)
+- [Context and Dependency Injection](https://quarkus.io/guides/cdi)
 
 ## Testing
 

@@ -1,12 +1,11 @@
 package de.idigath.web;
 
-import de.idigath.entity.Article;
-import de.idigath.mapper.ArticleMapper;
 import de.idigath.model.ArticleDto;
+import de.idigath.service.ArticleService;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -33,6 +32,8 @@ import org.jboss.resteasy.reactive.RestResponse;
 @Tag(name = "Articles", description = "Articles operations.")
 public class ArticleEndpoint {
 
+  @Inject ArticleService articleService;
+
   /**
    * Retrieves the article by its unique identifier.
    *
@@ -43,10 +44,7 @@ public class ArticleEndpoint {
   @Path("/{id}")
   @Produces(MediaType.APPLICATION_JSON)
   public RestResponse<ArticleDto> getArticle(@PathParam("id") BigInteger id) {
-    var article =
-        Article.<Article>findByIdOptional(id)
-            .orElseThrow(() -> new NotFoundException("Article with id: " + id + " not found"));
-    ArticleDto result = ArticleMapper.INSTANCE.articleToArticleDto(article);
+    var result = articleService.findArticleById(id);
     return RestResponse.ok(result);
   }
 

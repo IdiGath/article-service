@@ -1,4 +1,4 @@
-package de.idigath.web;
+package de.idigath.exception;
 
 import jakarta.ws.rs.ext.ParamConverter;
 import jakarta.ws.rs.ext.ParamConverterProvider;
