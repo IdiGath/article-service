@@ -15,7 +15,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
-import java.math.BigInteger;
 import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -43,7 +42,7 @@ public class ArticleEndpoint {
   @GET
   @Path("/{id}")
   @Produces(MediaType.APPLICATION_JSON)
-  public RestResponse<ArticleDto> getArticle(@PathParam("id") BigInteger id) {
+  public RestResponse<ArticleDto> getArticle(@PathParam("id") Long id) {
     var result = articleService.findArticleById(id);
     return RestResponse.ok(result);
   }

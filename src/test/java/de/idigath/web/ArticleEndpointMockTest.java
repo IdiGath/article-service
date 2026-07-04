@@ -7,7 +7,6 @@ import io.quarkus.test.InjectMock;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.persistence.PersistenceException;
-import java.math.BigInteger;
 import java.sql.SQLTimeoutException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -35,7 +34,7 @@ public class ArticleEndpointMockTest {
     PersistenceException persistenceException =
         new PersistenceException(new SQLTimeoutException("Query timeout"));
 
-    Mockito.when(articleService.findArticleById(BigInteger.ONE)).thenThrow(persistenceException);
+    Mockito.when(articleService.findArticleById(1L)).thenThrow(persistenceException);
 
     when().get("/" + "1").then().statusCode(504);
   }

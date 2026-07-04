@@ -5,7 +5,6 @@ import de.idigath.mapper.ArticleMapper;
 import de.idigath.model.ArticleDto;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.NotFoundException;
-import java.math.BigInteger;
 
 /**
  * Service layer for article-related business operations.
@@ -38,7 +37,7 @@ public class ArticleService {
    * @throws NotFoundException if no article exists with the given ID
    * @throws PersistenceException if a database error occurs (including timeout)
    */
-  public ArticleDto findArticleById(BigInteger id) {
+  public ArticleDto findArticleById(Long id) {
     var article =
         Article.<Article>findByIdOptional(id)
             .orElseThrow(() -> new NotFoundException("Article with id: " + id + " not found"));
