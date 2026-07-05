@@ -1,6 +1,7 @@
 package de.idigath.web;
 
 import de.idigath.model.ArticleDto;
+import de.idigath.model.ArticleOverview;
 import de.idigath.service.ArticleService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -19,7 +20,6 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.List;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.reactive.RestResponse;
 
@@ -32,6 +32,30 @@ import org.jboss.resteasy.reactive.RestResponse;
 public class ArticleEndpoint {
 
   @Inject ArticleService articleService;
+
+  /**
+   * Retrieves all article overview from the database sorted by creation date.
+   *
+   * @return ArticleOverview {@link ArticleOverview} in json-format
+   */
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  public RestResponse<ArticleOverview> getArticleOverview() {
+    return null;
+  }
+
+  /**
+   * Retrieves article overview from the database sorted by creatiomn date at the current selection
+   * page.
+   *
+   * @param page page number of selection
+   * @return ArticleOverview {@link ArticleOverview} in json-format
+   */
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  public RestResponse<ArticleOverview> getArticleOverview(@QueryParam("page") Integer page) {
+    return null;
+  }
 
   /**
    * Retrieves the article by its unique identifier.
@@ -52,6 +76,7 @@ public class ArticleEndpoint {
    * a text query (including regex), a tag, or both. If no articles match the criteria, an empty set
    * is returned.
    *
+   * @param page current page, if null then return first page
    * @param query the text query (including regex) to search for in article titles. If {@code null}
    *     or empty, this parameter is ignored.
    * @param tag the tag to filter articles. If {@code null} or empty, this parameter is ignored.
@@ -61,8 +86,10 @@ public class ArticleEndpoint {
   @GET
   @Path("/search")
   @Produces(MediaType.APPLICATION_JSON)
-  public RestResponse<List<ArticleDto>> searchArticle(
-      @QueryParam("query") String query, @QueryParam("tag") String tag) {
+  public RestResponse<ArticleOverview> searchArticle(
+      @QueryParam("page") Integer page,
+      @QueryParam("query") String query,
+      @QueryParam("tag") String tag) {
     return null;
   }
 
