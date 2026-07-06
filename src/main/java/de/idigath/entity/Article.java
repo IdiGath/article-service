@@ -1,5 +1,6 @@
 package de.idigath.entity;
 
+import de.idigath.model.ArticlePreviewDto;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -15,6 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
 
 /**
  * Blog article entity with Markdown content and metadata.
@@ -38,7 +40,13 @@ public class Article extends PanacheEntity {
   @Column(length = 500, nullable = false)
   public String summary;
 
-  /** Content auf the article in markdown format.. */
+  /**
+   * Content auf the article in markdown format. The text is loaded lazy to save resoruces for
+   * article previews.
+   *
+   * @see ArticlePreviewDto
+   */
+  @Lazy
   @Column(nullable = false, columnDefinition = "TEXT", name = "text_content")
   public String textContent;
 

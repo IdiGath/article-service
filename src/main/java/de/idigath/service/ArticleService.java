@@ -44,4 +44,9 @@ public class ArticleService {
     ArticleDto result = ArticleMapper.INSTANCE.articleToArticleDto(article);
     return result;
   }
+
+  public ArticleOverview count() {
+
+    return null;
+  }
 }
