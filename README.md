@@ -20,7 +20,33 @@ The project consists of:
 
 ## Getting Started
 
-//TODO
+This project uses **Quarkus DevServices** which automatically manages a PostgreSQL container for development and testing. No manual Docker setup required.
+
+### Prerequisites
+- Java 21+
+- Maven (or use the provided `./mvnw` wrapper)
+- Docker or Podman (for DevServices to auto-start PostgreSQL)
+
+### Using the Makefile
+
+| Command | Description |
+|---------|-------------|
+| `make dev` | Start Quarkus in development mode (DevServices auto-starts PostgreSQL) |
+| `make build` | Build the project with Maven |
+| `make test` | Run unit and integration tests |
+| `make generate-dev-sql` | Generate the DevServices init SQL script |
+| `make clean-dev-sql` | Clean up generated SQL files |
+
+### Quick Start
+```bash
+# Generate the database init script (required for DevServices)
+make generate-dev-sql
+
+# Start development server with hot reload
+make dev
+```
+
+The application will be available at `http://localhost:8080`. DevServices automatically starts PostgreSQL and applies the database schema via Liquibase.
 
 ## OpenAPI
 - Swagger-UI: http://localhost:8080/q/swagger-ui/
@@ -44,8 +70,20 @@ The project consists of:
 
 ## Testing
 
-Coverage reports are generated at `target/site/jacoco/index.html` after running:
+Run tests using the Makefile or Maven directly:
+
+```bash
+make test
+# or
+./mvnw test
+```
+
+This runs all tests via Maven Surefire plugin. Currently there are no separate Maven Failsafe integration tests (no `*IT.java` files or `src/it/` directory). The `<skipITs>true</skipITs>` property in `pom.xml` ensures that if Failsafe integration tests are added in the future, they will be skipped by default.
+
+To run tests with coverage reports:
 
 ```bash
 ./mvnw clean verify
 ```
+
+Coverage reports are generated at `target/site/jacoco/index.html`.
