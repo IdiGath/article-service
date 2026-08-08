@@ -11,4 +11,4 @@ import java.util.List;
  * clients. All temporal fields use the server's local time zone.
  */
 public record ArticleOverview(
-    List<ArticlePreview> atircleList, long totalArticles, int currentPage, int totalPages) {}
+    List<ArticlePreviewDto> atircleList, long totalArticles, int currentPage, int totalPages) {}
