@@ -34,26 +34,16 @@ public class ArticleEndpoint {
   @Inject ArticleService articleService;
 
   /**
-   * Retrieves all article overview from the database sorted by creation date.
+   * Retrieves article overview from the database sorted by creation date.
+   * If page is null, returns the first page.
    *
-   * @return ArticleOverview {@link ArticleOverview} in json-format
-   */
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  public RestResponse<ArticleOverview> getArticleOverview() {
-    return null;
-  }
-
-  /**
-   * Retrieves article overview from the database sorted by creatiomn date at the current selection
-   * page.
-   *
-   * @param page page number of selection
+   * @param page page number of selection (optional, defaults to first page)
    * @return ArticleOverview {@link ArticleOverview} in json-format
    */
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   public RestResponse<ArticleOverview> getArticleOverview(@QueryParam("page") Integer page) {
+    // TODO: Implement
     return null;
   }
 
@@ -77,7 +67,7 @@ public class ArticleEndpoint {
    * is returned.
    *
    * @param page current page, if null then return first page
-   * @param query the text query (including regex) to search for in article titles. If {@code null}
+   * @param text the text query (including regex) to search for in article titles. If {@code null}
    *     or empty, this parameter is ignored.
    * @param tag the tag to filter articles. If {@code null} or empty, this parameter is ignored.
    * @return a list of {@link ArticleDto} objects matching the search criteria. Returns an empty set
@@ -88,8 +78,9 @@ public class ArticleEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   public RestResponse<ArticleOverview> searchArticle(
       @QueryParam("page") Integer page,
-      @QueryParam("query") String query,
+      @QueryParam("text") String text,
       @QueryParam("tag") String tag) {
+    // TODO: Implement
     return null;
   }
 
@@ -104,6 +95,7 @@ public class ArticleEndpoint {
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   public RestResponse<Void> addArticle(ArticleDto article, @Context UriInfo uriinfo) {
+    // TODO:  Implement
     URI location = uriinfo.getAbsolutePathBuilder().path("42").build();
     return RestResponse.created(location);
   }
@@ -117,7 +109,7 @@ public class ArticleEndpoint {
   @DELETE
   @Path("/{id}")
   public RestResponse<Void> deleteArticle(@PathParam("id") int id) {
-
+    // TODO: Implement
     return RestResponse.noContent();
   }
 
@@ -132,6 +124,7 @@ public class ArticleEndpoint {
   @Path("/{id}")
   @Consumes(MediaType.APPLICATION_JSON)
   public RestResponse<ArticleDto> editArticle(@PathParam("id") int id, ArticleDto article) {
+    // TODO: Implement
     Date lastModified = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
     return RestResponse.ResponseBuilder.ok(article).lastModified(lastModified).build();
   }
