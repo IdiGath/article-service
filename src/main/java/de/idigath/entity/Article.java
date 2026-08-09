@@ -2,6 +2,7 @@ package de.idigath.entity;
 
 import de.idigath.model.ArticlePreviewDto;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,10 +10,13 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -25,8 +29,30 @@ import org.hibernate.validator.internal.util.stereotypes.Lazy;
  * auto-filled by Hibernate.
  */
 @Entity
+@NamedQueries({
+  @NamedQuery(
+      name = "Article.findByTitleAndTag",
+      query =
+          "from Article a join a.tags t where a.title like concat('%', :title, '%') and t.name like"
+              + " concat ('%', :tag, '%')")
+})
 @Table(name = "articles")
 public class Article extends PanacheEntity {
+
+  /**
+   * Searches for articles by title and tag with wildcard matching.
+   *
+   * <p>The query performs a LIKE search with wildcards (%) automatically appended to both the title
+   * and tag parameters, allowing partial matches.
+   *
+   * @param title text to search for in article titles (case-sensitive, supports partial matches)
+   * @param tag text to search for in associated tag names (case-sensitive, supports partial
+   *     matches)
+   * @return a PanacheQuery containing articles that match both the title and tag criteria
+   */
+  public static PanacheQuery<Article> findByTitleAndTag(String title, String tag) {
+    return find("#Article.findByTitleAndTag", Map.of("title", title, "tag", tag));
+  }
 
   /** Article title to display at the beginning of the article and in the article list. */
   @Column(length = 255, nullable = false)

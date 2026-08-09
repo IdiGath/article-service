@@ -3,6 +3,7 @@ package de.idigath.service;
 import de.idigath.entity.Article;
 import de.idigath.mapper.ArticleMapper;
 import de.idigath.model.ArticleDto;
+import de.idigath.model.ArticleOverview;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.NotFoundException;
 
@@ -45,7 +46,10 @@ public class ArticleService {
     return result;
   }
 
-  public ArticleOverview count() {
+  // TODO: Implement
+  public ArticleOverview getArticleOverviewList(Integer page, String text, String tag) {
+
+    var articleList = Article.findByTitleAndTag(text, tag).page(page, 10);
 
     return null;
   }

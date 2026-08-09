@@ -17,7 +17,7 @@ import java.util.Set;
  * side of the bidirectional {@link ManyToMany} relationship with {@link Article}. The owning side
  * is defined in the {@link Article#tags} field.
  *
- * <p>Extends {@link PanacheEntity} for automatic ID managemeint and CRUD operations.
+ * <p>Extends {@link PanacheEntity} for automatic ID management and CRUD operations.
  *
  * <p>Used for categorizing and filtering articles by topics.
  */

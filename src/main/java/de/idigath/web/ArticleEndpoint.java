@@ -34,8 +34,8 @@ public class ArticleEndpoint {
   @Inject ArticleService articleService;
 
   /**
-   * Retrieves article overview from the database sorted by creation date.
-   * If page is null, returns the first page.
+   * Retrieves article overview from the database sorted by creation date. If page is null, returns
+   * the first page.
    *
    * @param page page number of selection (optional, defaults to first page)
    * @return ArticleOverview {@link ArticleOverview} in json-format
@@ -43,8 +43,8 @@ public class ArticleEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   public RestResponse<ArticleOverview> getArticleOverview(@QueryParam("page") Integer page) {
-    // TODO: Implement
-    return null;
+
+    return RestResponse.ok(result);
   }
 
   /**
