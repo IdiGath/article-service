@@ -12,7 +12,7 @@ services:
       POSTGRES_DB: article
       PGDATA: /var/lib/postgresql/data/pgdata/article
     volumes:
-      - /custom/mount:/var/lib/postgresql/data/article
+      - ./postgres_data:/var/lib/postgresql/data/article
     restart: unless-stopped
     ports:
       - "8085:5432"
