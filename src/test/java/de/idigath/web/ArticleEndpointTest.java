@@ -7,12 +7,17 @@ import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for the {@link ArticleEndpoint} class. Each test scenario verifies the expected HTTP status
- * code for a specific case. This class focuses solely on HTTP response validation and does not
+ * Tests for the {@link ArticleEndpoint} class. Each test scenario verifies the
+ * expected HTTP status
+ * code for a specific case. This class focuses solely on HTTP response
+ * validation and does not
  * check the response content.
  *
- * <p>The correctness of data mapping and database content is verified in the Mapper and Entity test
- * classes. All test classes use a dedicated test container to ensure isolated test data for each
+ * <p>
+ * The correctness of data mapping and database content is verified in the
+ * Mapper and Entity test
+ * classes. All test classes use a dedicated test container to ensure isolated
+ * test data for each
  * test execution.
  */
 @QuarkusTest

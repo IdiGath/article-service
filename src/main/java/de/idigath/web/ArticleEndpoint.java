@@ -24,17 +24,21 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.reactive.RestResponse;
 
 /**
- * RESTful endpoint for managing articles and related entities. Provides CRUD operations for
- * articles. Also supports operations with associated entities such as sources and tags.
+ * RESTful endpoint for managing articles and related entities. Provides CRUD
+ * operations for
+ * articles. Also supports operations with associated entities such as sources
+ * and tags.
  */
 @Path("/api/articles")
 @Tag(name = "Articles", description = "Articles operations.")
 public class ArticleEndpoint {
 
-  @Inject ArticleService articleService;
+  @Inject
+  ArticleService articleService;
 
   /**
-   * Retrieves article overview from the database sorted by creation date. If page is null, returns
+   * Retrieves article overview from the database sorted by creation date. If page
+   * is null, returns
    * the first page.
    *
    * @param page page number of selection (optional, defaults to first page)
@@ -43,7 +47,7 @@ public class ArticleEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   public RestResponse<ArticleOverview> getArticleOverview(@QueryParam("page") Integer page) {
-
+    var result = articleService.searchArticleOverview(page, null, null);
     return RestResponse.ok(result);
   }
 
@@ -62,16 +66,21 @@ public class ArticleEndpoint {
   }
 
   /**
-   * Searches for articles based on the provided query and/or tag. The search can be performed using
-   * a text query (including regex), a tag, or both. If no articles match the criteria, an empty set
+   * Searches for articles based on the provided query and/or tag. The search can
+   * be performed using
+   * a text query (including regex), a tag, or both. If no articles match the
+   * criteria, an empty set
    * is returned.
    *
    * @param page current page, if null then return first page
-   * @param text the text query (including regex) to search for in article titles. If {@code null}
-   *     or empty, this parameter is ignored.
-   * @param tag the tag to filter articles. If {@code null} or empty, this parameter is ignored.
-   * @return a list of {@link ArticleDto} objects matching the search criteria. Returns an empty set
-   *     if no articles are found.
+   * @param text the text query (including regex) to search for in article titles.
+   *             If {@code null}
+   *             or empty, this parameter is ignored.
+   * @param tag  the tag to filter articles. If {@code null} or empty, this
+   *             parameter is ignored.
+   * @return a list of {@link ArticleDto} objects matching the search criteria.
+   *         Returns an empty set
+   *         if no articles are found.
    */
   @GET
   @Path("/search")
@@ -85,7 +94,8 @@ public class ArticleEndpoint {
   }
 
   /**
-   * Creates a new article in the database. After resource creation responses with the URI to the
+   * Creates a new article in the database. After resource creation responses with
+   * the URI to the
    * new Resource.
    *
    * @param article new article from the api consumer
@@ -95,7 +105,7 @@ public class ArticleEndpoint {
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   public RestResponse<Void> addArticle(ArticleDto article, @Context UriInfo uriinfo) {
-    // TODO:  Implement
+    // TODO: Implement
     URI location = uriinfo.getAbsolutePathBuilder().path("42").build();
     return RestResponse.created(location);
   }
@@ -116,7 +126,7 @@ public class ArticleEndpoint {
   /**
    * Updates current article with the new version from the body.
    *
-   * @param id the unique identifier of the article
+   * @param id      the unique identifier of the article
    * @param article new version of the article
    * @return HTTP-Satus 200 with modified time and updated article version in body
    */
