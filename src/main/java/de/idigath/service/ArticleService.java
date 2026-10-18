@@ -85,7 +85,7 @@ public class ArticleService {
    */
   public ArticleOverview searchArticleOverview(Integer page, String text, String tag) {
     int searchPage = Objects.nonNull(page) ? page : 0;
-    searchPage = searchPage > -1 ? searchPage : 0;
+    searchPage = searchPage > 0 ? searchPage - 1 : 0;
     String searchText = Objects.nonNull(text) ? text : "";
     String searchTag = Objects.nonNull(tag) ? tag : "";
 

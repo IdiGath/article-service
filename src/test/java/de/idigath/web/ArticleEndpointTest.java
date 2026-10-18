@@ -43,4 +43,10 @@ public class ArticleEndpointTest {
   public void testGetArticleOverviewHappyCase200() {
     when().get("/").then().statusCode(200);
   }
+
+  @Test
+  public void testGetArticleOverviewWithPageParameterHappyCase200() {
+    when().get("?page=1").then().statusCode(200);
+  }
+
 }
