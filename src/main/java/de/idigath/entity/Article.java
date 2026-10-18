@@ -3,6 +3,7 @@ package de.idigath.entity;
 import de.idigath.model.ArticlePreviewDto;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,13 +15,13 @@ import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.validator.internal.util.stereotypes.Lazy;
 
 /**
  * Blog article entity with Markdown content and metadata.
@@ -85,7 +86,7 @@ public class Article extends PanacheEntity {
    *
    * @see ArticlePreviewDto
    */
-  @Lazy
+  @Basic(fetch = FetchType.LAZY)
   @Column(nullable = false, columnDefinition = "TEXT", name = "text_content")
   public String textContent;
 

@@ -38,4 +38,9 @@ public class ArticleEndpointTest {
   public void testGetArticleNotNumberBadRequest400() {
     when().get("/" + "123A").then().statusCode(400);
   }
+
+  @Test
+  public void testGetArticleOverviewHappyCase200() {
+    when().get("/").then().statusCode(200);
+  }
 }

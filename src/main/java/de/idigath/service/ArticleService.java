@@ -84,19 +84,19 @@ public class ArticleService {
    *
    */
   public ArticleOverview searchArticleOverview(Integer page, String text, String tag) {
-    Integer searchPage = Objects.nonNull(page) ? page : 1;
-    searchPage = searchPage > 0 ? searchPage : 1;
+    int searchPage = Objects.nonNull(page) ? page : 0;
+    searchPage = searchPage > -1 ? searchPage : 0;
     String searchText = Objects.nonNull(text) ? text : "";
     String searchTag = Objects.nonNull(tag) ? tag : "";
 
-    var articleQuery = Article.findByTitleAndTag(searchText, searchTag).page(page, 10);
+    var articleQuery = Article.findByTitleAndTag(searchText, searchTag).page(searchPage, 10);
 
     List<Article> articleList = articleQuery.list();
     List<ArticlePreviewDto> articlePreviewList = new LinkedList<>();
     for (Article article : articleList) {
       articlePreviewList.add(ArticlePreviewMapper.INSTANCE.articleToArticlePreviewDto(article));
     }
-    var result = new ArticleOverview(articlePreviewList, articleQuery.count(), page, articleQuery.pageCount());
+    var result = new ArticleOverview(articlePreviewList, articleQuery.count(), searchPage, articleQuery.pageCount());
     return result;
   }
 }
