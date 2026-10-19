@@ -35,7 +35,7 @@ public class ArticleEndpointMockTest {
   ArticleService articleService;
 
   @Test
-  public void testGetArticleGatewayTimeout504() {
+  public void getArticle_serviceThrowsTimeout_returns504() {
 
     PersistenceException persistenceException = new PersistenceException(new SQLTimeoutException("Query timeout"));
 

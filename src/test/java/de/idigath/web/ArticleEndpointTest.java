@@ -25,27 +25,27 @@ import org.junit.jupiter.api.Test;
 public class ArticleEndpointTest {
 
   @Test
-  public void testGetArticleHappyCase200() {
+  public void getArticle_existingId_returns200() {
     when().get("/" + "151").then().statusCode(200);
   }
 
   @Test
-  public void testGetArticleWrongNumberNotFound404() {
+  public void getArticle_nonExistentId_returns404() {
     when().get("/" + "9999999").then().statusCode(404);
   }
 
   @Test
-  public void testGetArticleNotNumberBadRequest400() {
+  public void getArticle_nonNumericId_returns400() {
     when().get("/" + "123A").then().statusCode(400);
   }
 
   @Test
-  public void testGetArticleOverviewHappyCase200() {
+  public void getArticleOverview_noParameters_returns200() {
     when().get("/").then().statusCode(200);
   }
 
   @Test
-  public void testGetArticleOverviewWithPageParameterHappyCase200() {
+  public void getArticleOverview_withPageParameter_returns200() {
     when().get("?page=1").then().statusCode(200);
   }
 

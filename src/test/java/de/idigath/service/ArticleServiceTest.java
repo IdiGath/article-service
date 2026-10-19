@@ -1,6 +1,6 @@
 package de.idigath.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
@@ -14,40 +14,35 @@ public class ArticleServiceTest {
   ArticleService articleService;
 
   @Test
-  void testGetArticleOverviewListEmptyParametersFirstPageOk() {
+  void searchArticleOverview_nullParameters_returnsFirstPage() {
     var result = articleService.searchArticleOverview(null, null, null);
 
-    assertEquals(5, result.totalArticles());
-    assertEquals(5, result.articleList().size());
+    assertThat(result.totalArticles()).isEqualTo(5);
+    assertThat(result.articleList()).hasSize(5);
   }
 
   @Test
-  void testGetArticleOverviewListNegativePageGetFirstPage() {
+  void searchArticleOverview_negativePage_returnsFirstPage() {
     var result = articleService.searchArticleOverview(-1, null, null);
 
-    assertEquals(5, result.totalArticles());
-    assertEquals(5, result.articleList().size());
-
+    assertThat(result.totalArticles()).isEqualTo(5);
+    assertThat(result.articleList()).hasSize(5);
   }
 
   @Test
-  void testGetArticleOverviewListParameterFirstPageOk() {
-
+  void searchArticleOverview_pageOne_returnsFirstPage() {
     var result = articleService.searchArticleOverview(1, null, null);
 
-    assertEquals(5, result.totalArticles());
-    assertEquals(5, result.articleList().size());
-
+    assertThat(result.totalArticles()).isEqualTo(5);
+    assertThat(result.articleList()).hasSize(5);
   }
 
   @Test
-  void testGetArticleOverviewListParameterSecondPageOk() {
-
+  void searchArticleOverview_pageTwo_returnsEmptyList() {
     var result = articleService.searchArticleOverview(2, null, null);
 
-    assertEquals(5, result.totalArticles());
-    assertEquals(0, result.articleList().size());
-
+    assertThat(result.totalArticles()).isEqualTo(5);
+    assertThat(result.articleList()).isEmpty();
   }
 
 }
