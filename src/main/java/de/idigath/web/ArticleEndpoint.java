@@ -89,8 +89,8 @@ public class ArticleEndpoint {
       @QueryParam("page") Integer page,
       @QueryParam("text") String text,
       @QueryParam("tag") String tag) {
-    // TODO: Implement
-    return null;
+    var result = articleService.searchArticleOverview(page, text, tag);
+    return RestResponse.ok(result);
   }
 
   /**

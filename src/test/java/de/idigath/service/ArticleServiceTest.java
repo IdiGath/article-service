@@ -45,4 +45,12 @@ public class ArticleServiceTest {
     assertThat(result.articleList()).isEmpty();
   }
 
+  @Test
+  void searchArticleOverview_pageOneJava_returnsFirstPageThreeArticles() {
+    var result = articleService.searchArticleOverview(1, null, "Java");
+
+    assertThat(result.totalArticles()).isEqualTo(3);
+    assertThat(result.articleList()).hasSize(3);
+  }
+
 }
