@@ -4,7 +4,7 @@ This project provides a backend service for managing blog articles.
 
 ## Architecture
 The project consists of:
-- **PostgreSQL Database** (configuration in `./db` and `./docker-compose.yml`)
+- **PostgreSQL Database** (Liquibase migrations in `src/main/resources/db/` and `./docker-compose.yml`)
 - **Quarkus service** for data processing and REST API
 
 ## Key Features
@@ -18,8 +18,7 @@ The project consists of:
 
 ## Workflow
 1. Articles are stored in the database as **Markdown**.
-2. The service parses Markdown into HTML on request.
-3. HTML is returned to the consumer via REST endpoints.
+2. Articles are returned to the consumer via REST endpoints.
 
 ## Getting Started
 
@@ -29,6 +28,7 @@ This project uses **Quarkus DevServices** which automatically manages a PostgreS
 - Java 21+
 - Maven (or use the provided `./mvnw` wrapper)
 - Docker or Podman (for DevServices to auto-start PostgreSQL)
+- `gettext` (provides `envsubst`, required for `make generate-dev-sql`)
 
 ### Using the Makefile
 
@@ -50,6 +50,33 @@ make dev
 ```
 
 The application will be available at `http://localhost:8080`. DevServices automatically starts PostgreSQL and applies the database schema via Liquibase.
+
+## Configuration
+
+The service uses environment variables for database credentials. Create a `.env` file in the project root (it is listed in `.gitignore` and must not be committed).
+
+**Dev profile** (used by `make dev`, `make generate-dev-sql`, and `docker-compose.yml`):
+
+| Variable | Description |
+|---|---|
+| `POSTGRES_PWD` | Password for the PostgreSQL superuser in the Docker container |
+| `DEV_ARTICLE_SERVICE_USER_PWD` | Password for the application database user |
+| `DEV_LIQUIBASE_USER_PWD` | Password for the Liquibase migration user |
+
+**Prod profile:**
+
+| Variable | Description |
+|---|---|
+| `PROD_ARTICLE_SERVICE_USER_PWD` | Password for the application database user |
+| `PROD_LIQUIBASE_USER_PASSWORD` | Password for the Liquibase migration user |
+
+Example `.env` for development:
+
+```bash
+POSTGRES_PWD=postgrespassword
+DEV_ARTICLE_SERVICE_USER_PWD=devpassword
+DEV_LIQUIBASE_USER_PWD=liquibasepassword
+```
 
 ## OpenAPI
 - Swagger-UI: http://localhost:8080/q/swagger-ui/

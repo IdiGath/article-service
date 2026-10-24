@@ -104,3 +104,4 @@ Thumbs.db
 *.tmp
 .vscode/
 .qodo/
+postgres_data/
