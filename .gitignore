@@ -60,7 +60,7 @@ spring.log
 *.crt
 
 # Database and generated SQL
-db/init.sql
+src/main/resources/db/dev/target/
 
 # VS Code
 .vscode/

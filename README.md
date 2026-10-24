@@ -2,6 +2,8 @@
 
 This project provides a backend service for managing blog articles.
 
+**Status:** Work in progress. Read-only API (GET by id, search with pagination) is implemented and tested. CRUD operations (POST/PUT/DELETE) are stubs returning hardcoded responses. Not production-ready.
+
 ## Architecture
 The project consists of:
 - **PostgreSQL Database** (Liquibase migrations in `src/main/resources/db/` and `./docker-compose.yml`)
@@ -15,6 +17,7 @@ The project consists of:
 - TODO **CRUD operations** (create, update, delete articles)
 - TODO **Regex search** in article titles (currently uses LIKE with wildcards)
 - TODO **Markdown-to-HTML parsing** (converts stored Markdown to HTML before returning it to the client)
+- TODO **Container image build** (wire up the generated Dockerfiles in `src/main/docker/` with make targets and documentation)
 
 ## Workflow
 1. Articles are stored in the database as **Markdown**.
@@ -22,7 +25,11 @@ The project consists of:
 
 ## Getting Started
 
-This project uses **Quarkus DevServices** which automatically manages a PostgreSQL container for development and testing. No manual Docker setup required.
+For development, this project uses **Quarkus DevServices** which automatically manages a PostgreSQL container — no manual Docker setup needed. For running PostgreSQL standalone (e.g., production mode), use `docker-compose.yml`:
+
+```bash
+docker compose up -d
+```
 
 ### Prerequisites
 - Java 21+
@@ -53,7 +60,7 @@ The application will be available at `http://localhost:8080`. DevServices automa
 
 ## Configuration
 
-The service uses environment variables for database credentials. Create a `.env` file in the project root (it is listed in `.gitignore` and must not be committed).
+The service uses environment variables for database credentials. Copy `.env.example` to `.env` in the project root and fill in real values (`.env` is listed in `.gitignore` and must not be committed).
 
 **Dev profile** (used by `make dev`, `make generate-dev-sql`, and `docker-compose.yml`):
 
@@ -79,9 +86,9 @@ DEV_LIQUIBASE_USER_PWD=liquibasepassword
 ```
 
 ## OpenAPI
-- Swagger-UI: http://localhost:8080/q/swagger-ui/
-- OpenAPI-Spec: http://localhost:8080/q/openapi
-- OpenAPI-Spec in JSON: http://localhost:8080/q/openapi?format=json
+- [Swagger UI](http://localhost:8080/q/swagger-ui/)
+- [OpenAPI Spec](http://localhost:8080/q/openapi)
+- [OpenAPI Spec (JSON)](http://localhost:8080/q/openapi?format=json)
 
 ## Sources that were useful
 - [Simplified Hibernate ORM with Panache](https://quarkus.io/guides/hibernate-orm-panache)
@@ -90,7 +97,6 @@ DEV_LIQUIBASE_USER_PWD=liquibasepassword
 - [Writing REST Services with Quarkus REST (formerly RESTEasy Reactive)](https://quarkus.io/guides/rest)
 - [Mapstruct](https://mapstruct.org/)
 - [Jackson serialization support for Quarkus REST](https://quarkus.io/guides/rest#json-serialisation)
-- [Connect to the PostgreSQL database via JDBC](https://quarkus.io/guides/datasource)
 - [Using OpenAPI and Swagger UI in Quarkus](https://quarkus.io/guides/openapi-swaggerui)
 - [Testing Your Application in Quarkus](https://quarkus.io/guides/getting-started-testing)
 - [Continuous Testing in Quarkus](https://quarkus.io/guides/continuous-testing)

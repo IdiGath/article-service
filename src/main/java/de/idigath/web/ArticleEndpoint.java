@@ -68,6 +68,7 @@ public class ArticleEndpoint {
    *         Returns an empty set
    *         if no articles are found.
    */
+  // TODO: regex search not yet implemented — currently uses LIKE with wildcards (see README TODO)
   @GET
   @Path("/search")
   @Produces(MediaType.APPLICATION_JSON)

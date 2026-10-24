@@ -4,7 +4,7 @@ networks:
 
 services:
   postgres:
-    image: "postgres:latest"
+    image: "postgres:18"
     container_name: "article-postgres"
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PWD}
