@@ -9,9 +9,12 @@ The project consists of:
 
 ## Key Features
 - **Article storage** in PostgreSQL (Markdown format)
-- **CRUD operations** for articles
+- **Article search** by title and tags (case-insensitive, supports multiple tags with AND logic)
+- **Pagination** for article lists
 - **REST API** for content access
-- **Markdown-to-HTML parsing** (converts stored Markdown to HTML before returning it to the client)
+- TODO **CRUD operations** (create, update, delete articles)
+- TODO **Regex search** in article titles (currently uses LIKE with wildcards)
+- TODO **Markdown-to-HTML parsing** (converts stored Markdown to HTML before returning it to the client)
 
 ## Workflow
 1. Articles are stored in the database as **Markdown**.
