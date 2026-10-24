@@ -64,11 +64,15 @@ public class ArticleService {
 
   /**
    * Retrieves the article overview based on the current page, text in the
-   * headline and tag.
+   * headline and tags.
    *
    * <p>
    * If no article will be found a method returns an overview with empty or
    * default values.
+   *
+   * <p>
+   * An article matches only if it has ALL of the given tags. Null or blank tags
+   * are ignored. If the tag list is null or empty, the tag filter is not applied.
    *
    * <p>
    * Database query timeouts are propagated as {@link PersistenceException}
@@ -79,17 +83,19 @@ public class ArticleService {
    *
    * @param page the current page number in the query
    * @param text text(pattern) in the headline
-   * @param tag  searched tag
+   * @param tags list of tags the article must have (case-insensitive)
    * @throws PersistenceException if a database error occurs (including timeout)
    *
    */
-  public ArticleOverview searchArticleOverview(Integer page, String text, String tag) {
+  public ArticleOverview searchArticleOverview(Integer page, String text, List<String> tags) {
     int searchPage = Objects.nonNull(page) ? page : 0;
     searchPage = searchPage > 0 ? searchPage - 1 : 0;
     String searchText = Objects.nonNull(text) ? text : "";
-    String searchTag = Objects.nonNull(tag) ? tag : "";
+    List<String> searchTags = Objects.nonNull(tags)
+        ? tags.stream().filter(Objects::nonNull).filter(t -> !t.isBlank()).map(String::toLowerCase).toList()
+        : List.of();
 
-    var articleQuery = Article.findByTitleAndTag(searchText, searchTag).page(searchPage, 10);
+    var articleQuery = Article.findByTitleAndTags(searchText, searchTags).page(searchPage, 10);
 
     List<Article> articleList = articleQuery.list();
     List<ArticlePreviewDto> articlePreviewList = new LinkedList<>();

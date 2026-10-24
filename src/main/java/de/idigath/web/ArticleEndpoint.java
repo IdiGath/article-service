@@ -20,6 +20,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.reactive.RestResponse;
 
@@ -37,21 +38,6 @@ public class ArticleEndpoint {
   ArticleService articleService;
 
   /**
-   * Retrieves article overview from the database sorted by creation date. If page
-   * is null, returns
-   * the first page.
-   *
-   * @param page page number of selection (optional, defaults to first page)
-   * @return ArticleOverview {@link ArticleOverview} in json-format
-   */
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  public RestResponse<ArticleOverview> getArticleOverview(@QueryParam("page") Integer page) {
-    var result = articleService.searchArticleOverview(page, null, null);
-    return RestResponse.ok(result);
-  }
-
-  /**
    * Retrieves the article by its unique identifier.
    *
    * @param id the unique identifier of the article
@@ -66,18 +52,18 @@ public class ArticleEndpoint {
   }
 
   /**
-   * Searches for articles based on the provided query and/or tag. The search can
+   * Searches for articles based on the provided query and/or tags. The search can
    * be performed using
-   * a text query (including regex), a tag, or both. If no articles match the
-   * criteria, an empty set
-   * is returned.
+   * a text query (including regex), one or more tags, or both. An article matches
+   * only if it has ALL of the given tags. If no articles match the criteria, an
+   * empty set is returned.
    *
    * @param page current page, if null then return first page
    * @param text the text query (including regex) to search for in article titles.
    *             If {@code null}
    *             or empty, this parameter is ignored.
-   * @param tag  the tag to filter articles. If {@code null} or empty, this
-   *             parameter is ignored.
+   * @param tags the list of tags to filter articles. An article must have all of
+   *             them. If {@code null} or empty, this parameter is ignored.
    * @return a list of {@link ArticleDto} objects matching the search criteria.
    *         Returns an empty set
    *         if no articles are found.
@@ -88,8 +74,8 @@ public class ArticleEndpoint {
   public RestResponse<ArticleOverview> searchArticle(
       @QueryParam("page") Integer page,
       @QueryParam("text") String text,
-      @QueryParam("tag") String tag) {
-    var result = articleService.searchArticleOverview(page, text, tag);
+      @QueryParam("tag") List<String> tags) {
+    var result = articleService.searchArticleOverview(page, text, tags);
     return RestResponse.ok(result);
   }
 

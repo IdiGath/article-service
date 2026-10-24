@@ -1,24 +1,20 @@
 package de.idigath.web;
 
 import static io.restassured.RestAssured.when;
+import static org.hamcrest.Matchers.equalTo;
 
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for the {@link ArticleEndpoint} class. Each test scenario verifies the
- * expected HTTP status
- * code for a specific case. This class focuses solely on HTTP response
- * validation and does not
- * check the response content.
+ * Integration tests for the {@link ArticleEndpoint} class. Verifies HTTP status
+ * codes and response content for article search scenarios.
  *
  * <p>
  * The correctness of data mapping and database content is verified in the
- * Mapper and Entity test
- * classes. All test classes use a dedicated test container to ensure isolated
- * test data for each
- * test execution.
+ * Mapper and Entity test classes. All test classes use a dedicated test
+ * container to ensure isolated test data for each test execution.
  */
 @QuarkusTest
 @TestHTTPEndpoint(ArticleEndpoint.class)
@@ -40,13 +36,54 @@ public class ArticleEndpointTest {
   }
 
   @Test
-  public void getArticleOverview_noParameters_returns200() {
-    when().get("/").then().statusCode(200);
+  public void searchArticle_noParameters_returnsAllArticles() {
+    when()
+        .get("/search")
+        .then()
+        .statusCode(200)
+        .body("totalArticles", equalTo(5))
+        .body("articleList.size()", equalTo(5));
   }
 
   @Test
-  public void getArticleOverview_withPageParameter_returns200() {
-    when().get("?page=1").then().statusCode(200);
+  public void searchArticle_withPageParameter_returnsFirstPage() {
+    when()
+        .get("/search?page=1")
+        .then()
+        .statusCode(200)
+        .body("totalArticles", equalTo(5))
+        .body("articleList.size()", equalTo(5));
+  }
+
+  @Test
+  public void searchArticle_pageTwo_returnsEmptyListButTotalFive() {
+    when()
+        .get("/search?page=2")
+        .then()
+        .statusCode(200)
+        .body("totalArticles", equalTo(5))
+        .body("articleList.size()", equalTo(0));
+  }
+
+  @Test
+  public void searchArticle_singleTagJava_returnsThreeArticles() {
+    when()
+        .get("/search?tag=Java")
+        .then()
+        .statusCode(200)
+        .body("totalArticles", equalTo(3))
+        .body("articleList.size()", equalTo(3));
+  }
+
+  @Test
+  public void searchArticle_twoTagsJavaAndPerformance_returnsOneMatchingArticle() {
+    when()
+        .get("/search?page=1&tag=Java&tag=Performance")
+        .then()
+        .statusCode(200)
+        .body("totalArticles", equalTo(1))
+        .body("articleList.size()", equalTo(1))
+        .body("articleList[0].title", equalTo("Java 21: New Features"));
   }
 
 }

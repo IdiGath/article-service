@@ -18,7 +18,9 @@ import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -33,30 +35,42 @@ import org.hibernate.annotations.UpdateTimestamp;
  */
 @Entity
 @NamedQueries({
-    @NamedQuery(name = "Article.findByTitleAndTag", query = "select distinct a from Article a join a.tags t where a.title like concat('%', :title, '%') and t.name like"
-        + " concat ('%', :tag, '%')")
+    @NamedQuery(name = "Article.findByTitleAndTags", query = "select a from Article a join a.tags t"
+        + " where lower(a.title) like lower(concat('%', :title, '%'))"
+        + " and lower(t.name) in :tags group by a having count(distinct t) = :tagCount")
 })
 @Table(name = "articles")
 public class Article extends PanacheEntity {
 
   /**
-   * Searches for articles by title and tag with wildcard matching.
+   * Searches for articles by title and a list of tags with wildcard matching.
    *
    * <p>
-   * The query performs a LIKE search with wildcards (%) automatically appended to
-   * both the title
-   * and tag parameters, allowing partial matches.
+   * The query performs a LIKE search on the title with wildcards (%)
+   * automatically
+   * appended, allowing partial matches. For tags, an article matches only if it
+   * has ALL of the given tags (case-insensitive, supports partial matches).
    *
-   * @param title text to search for in article titles (case-sensitive, supports
+   * <p>
+   * If the tag list is null or empty, the tag filter is not applied and all
+   * articles matching the title are returned.
+   *
+   * @param title text to search for in article titles (case-insensitive, supports
    *              partial matches)
-   * @param tag   text to search for in associated tag names (case-sensitive,
-   *              supports partial
-   *              matches)
-   * @return a PanacheQuery containing articles that match both the title and tag
-   *         criteria
+   * @param tags  list of tag names the article must have (case-insensitive,
+   *              supports partial matches). Duplicates are ignored.
+   * @return a PanacheQuery containing articles that match both the title and all
+   *         tag criteria
    */
-  public static PanacheQuery<Article> findByTitleAndTag(String title, String tag) {
-    return find("#Article.findByTitleAndTag", Map.of("title", title, "tag", tag));
+  public static PanacheQuery<Article> findByTitleAndTags(String title, List<String> tags) {
+    if (Objects.isNull(tags) || tags.isEmpty()) {
+      return find("lower(title) like lower(concat('%', ?1, '%'))", title);
+    }
+    var distinctTags = tags.stream().distinct().toList();
+    return find("#Article.findByTitleAndTags", Map.of(
+        "title", title,
+        "tags", distinctTags,
+        "tagCount", distinctTags.size()));
   }
 
   /**
