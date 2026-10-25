@@ -86,4 +86,14 @@ public class ArticleEndpointTest {
         .body("articleList[0].title", equalTo("Java 21: New Features"));
   }
 
+  @Test
+  public void searchArticle_textWithEncodedPercentSign_returnsNoArticles() {
+    when()
+        .get("/search?text=%25")
+        .then()
+        .statusCode(200)
+        .body("totalArticles", equalTo(0))
+        .body("articleList.size()", equalTo(0));
+  }
+
 }

@@ -36,7 +36,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Entity
 @NamedQueries({
     @NamedQuery(name = "Article.findByTitleAndTags", query = "select a from Article a join a.tags t"
-        + " where lower(a.title) like lower(concat('%', :title, '%'))"
+        + " where lower(a.title) like lower(concat('%', :title, '%')) escape '!'"
         + " and lower(t.name) in :tags group by a having count(distinct t) = :tagCount")
 })
 @Table(name = "articles")
@@ -55,6 +55,11 @@ public class Article extends PanacheEntity {
    * If the tag list is null or empty, the tag filter is not applied and all
    * articles matching the title are returned.
    *
+   * <p>
+   * The title is matched as a literal substring: LIKE wildcard characters
+   * ({@code %}, {@code _}) in the input are escaped and treated as ordinary
+   * characters.
+   *
    * @param title text to search for in article titles (case-insensitive, supports
    *              partial matches)
    * @param tags  list of tag names the article must have (case-insensitive,
@@ -63,14 +68,31 @@ public class Article extends PanacheEntity {
    *         tag criteria
    */
   public static PanacheQuery<Article> findByTitleAndTags(String title, List<String> tags) {
+    String escapedTitle = escapeLikePattern(title);
     if (Objects.isNull(tags) || tags.isEmpty()) {
-      return find("lower(title) like lower(concat('%', ?1, '%'))", title);
+      return find("lower(title) like lower(concat('%', ?1, '%')) escape '!'", escapedTitle);
     }
     var distinctTags = tags.stream().distinct().toList();
     return find("#Article.findByTitleAndTags", Map.of(
-        "title", title,
+        "title", escapedTitle,
         "tags", distinctTags,
         "tagCount", distinctTags.size()));
+  }
+
+  /**
+   * Escapes the LIKE escape character and wildcards ({@code %}, {@code _}) in
+   * user input so they are matched literally instead of acting as pattern
+   * wildcards. Uses {@code !} as the escape character.
+   *
+   * @param value raw user input, may be {@code null}
+   * @return the value safe to embed into a LIKE pattern with {@code !} as the
+   *         escape character
+   */
+  private static String escapeLikePattern(String value) {
+    if (Objects.isNull(value)) {
+      return null;
+    }
+    return value.replace("!", "!!").replace("%", "!%").replace("_", "!_");
   }
 
   /**

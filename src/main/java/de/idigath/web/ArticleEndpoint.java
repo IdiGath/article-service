@@ -60,7 +60,8 @@ public class ArticleEndpoint {
    *
    * @param page current page, if null then return first page
    * @param text the text query to search for in article titles (case-insensitive
-   *             substring match). If {@code null}
+   *             substring match; LIKE wildcards {@code %} and {@code _} are treated
+   *             literally). If {@code null}
    *             or empty, this parameter is ignored.
    * @param tags the list of tags to filter articles. An article must have all of
    *             them. If {@code null} or empty, this parameter is ignored.

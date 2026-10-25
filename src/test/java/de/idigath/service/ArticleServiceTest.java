@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import de.idigath.entity.Article;
+import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 
@@ -125,6 +127,39 @@ public class ArticleServiceTest {
 
     assertThat(result.totalArticles()).isEqualTo(1);
     assertThat(result.articleList()).hasSize(1);
+  }
+
+  @Test
+  void searchArticleOverview_textWithPercentSign_returnsNoArticles() {
+    var result = articleService.searchArticleOverview(1, "%", null);
+
+    assertThat(result.totalArticles()).isZero();
+    assertThat(result.articleList()).isEmpty();
+  }
+
+  @Test
+  void searchArticleOverview_textWithUnderscore_returnsNoArticles() {
+    var result = articleService.searchArticleOverview(1, "_", null);
+
+    assertThat(result.totalArticles()).isZero();
+    assertThat(result.articleList()).isEmpty();
+  }
+
+  @Test
+  @TestTransaction
+  void searchArticleOverview_textWithPercentSign_returnsOnlyLiteralMatches() {
+    Article article = new Article();
+    article.title = "Weekend sale: 100% off";
+    article.logoUrl = "https://example.com/logos/sale.png";
+    article.summary = "Sale summary";
+    article.textContent = "Sale content";
+    article.persist();
+
+    var result = articleService.searchArticleOverview(1, "100%", null);
+
+    assertThat(result.totalArticles()).isEqualTo(1);
+    assertThat(result.articleList()).hasSize(1);
+    assertThat(result.articleList().get(0).title()).isEqualTo("Weekend sale: 100% off");
   }
 
 }

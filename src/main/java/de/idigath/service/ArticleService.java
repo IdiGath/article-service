@@ -82,7 +82,8 @@ public class ArticleService {
    * exception mapper.
    *
    * @param page the current page number in the query
-   * @param text text to search for in the headline (case-insensitive substring match)
+   * @param text text to search for in the headline (case-insensitive substring match; LIKE
+   *             wildcards {@code %} and {@code _} are treated literally)
    * @param tags list of tags the article must have (case-insensitive)
    * @throws PersistenceException if a database error occurs (including timeout)
    *
