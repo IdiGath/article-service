@@ -54,13 +54,13 @@ public class ArticleEndpoint {
   /**
    * Searches for articles based on the provided query and/or tags. The search can
    * be performed using
-   * a text query (including regex), one or more tags, or both. An article matches
+   * a text query, one or more tags, or both. An article matches
    * only if it has ALL of the given tags. If no articles match the criteria, an
    * empty set is returned.
    *
    * @param page current page, if null then return first page
-   * @param text the text query (including regex) to search for in article titles.
-   *             If {@code null}
+   * @param text the text query to search for in article titles (case-insensitive
+   *             substring match). If {@code null}
    *             or empty, this parameter is ignored.
    * @param tags the list of tags to filter articles. An article must have all of
    *             them. If {@code null} or empty, this parameter is ignored.
@@ -68,7 +68,6 @@ public class ArticleEndpoint {
    *         Returns an empty set
    *         if no articles are found.
    */
-  // TODO: regex search not yet implemented — currently uses LIKE with wildcards (see README TODO)
   @GET
   @Path("/search")
   @Produces(MediaType.APPLICATION_JSON)

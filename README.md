@@ -15,7 +15,6 @@ The project consists of:
 - **Pagination** for article lists
 - **REST API** for content access
 - TODO **CRUD operations** (create, update, delete articles)
-- TODO **Regex search** in article titles (currently uses LIKE with wildcards)
 - TODO **Markdown-to-HTML parsing** (converts stored Markdown to HTML before returning it to the client)
 - TODO **Container image build** (wire up the generated Dockerfiles in `src/main/docker/` with make targets and documentation)
 
