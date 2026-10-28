@@ -15,6 +15,7 @@ The project consists of:
 - **Pagination** for article lists
 - **REST API** for content access
 - TODO **CRUD operations** (create, update, delete articles)
+- TODO **AI-powered article classification and spell-checking** (on article creation via POST: auto-suggest tags/categories from content, check spelling without altering writing style — see Vikunja task)
 - TODO **Markdown-to-HTML parsing** (converts stored Markdown to HTML before returning it to the client)
 - TODO **Container image build** (wire up the generated Dockerfiles in `src/main/docker/` with make targets and documentation)
 
