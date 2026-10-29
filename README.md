@@ -2,7 +2,7 @@
 
 This project provides a backend service for managing blog articles.
 
-**Status:** Work in progress. Read-only API (GET by id, search with pagination) is implemented and tested. CRUD operations (POST/PUT/DELETE) are stubs returning hardcoded responses. Not production-ready.
+**Status:** Work in progress. GET article by title, search with pagination, and DELETE by title are implemented and tested. Create (POST) and update (PUT) are stubs returning hardcoded responses. Not production-ready.
 
 ## Architecture
 The project consists of:
@@ -13,8 +13,9 @@ The project consists of:
 - **Article storage** in PostgreSQL (Markdown format)
 - **Article search** by title and tags (case-insensitive, supports multiple tags with AND logic)
 - **Pagination** for article lists
+- **Article deletion** by exact title match (case-insensitive)
 - **REST API** for content access
-- TODO **CRUD operations** (create, update, delete articles)
+- TODO **Create and update operations** (create, update articles)
 - TODO **AI-powered article classification and spell-checking** (on article creation via POST: auto-suggest tags/categories from content, check spelling without altering writing style — see Vikunja task)
 - TODO **Markdown-to-HTML parsing** (converts stored Markdown to HTML before returning it to the client)
 - TODO **Container image build** (wire up the generated Dockerfiles in `src/main/docker/` with make targets and documentation)
@@ -22,6 +23,10 @@ The project consists of:
 ## Workflow
 1. Articles are stored in the database as **Markdown**.
 2. Articles are returned to the consumer via REST endpoints.
+
+## Development Process and AI Assistance
+
+This project is developed with the assistance of [Mistral Vibe](https://mistral.ai), a CLI coding agent by Mistral AI. All work is human-directed and human-reviewed: design decisions, review, corrections, and final approval of every change are made by the maintainer. Code is never merged without human oversight.
 
 ## Getting Started
 
