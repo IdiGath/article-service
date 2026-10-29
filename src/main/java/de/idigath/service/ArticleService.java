@@ -37,7 +37,7 @@ import jakarta.ws.rs.NotFoundException;
 public class ArticleService {
 
   /**
-   * Retrieves an article by its title as unique identifier.
+   * Retrieves the article with the given title (case-insensitive exact match).
    *
    * <p>
    * If no article exists with the specified title, a {@link NotFoundException}
@@ -45,12 +45,10 @@ public class ArticleService {
    *
    * <p>
    * Database query timeouts are propagated as {@link PersistenceException}
-   * wrapping a {@link
-   * SQLTimeoutException}, which is later mapped to an HTTP 504 Gateway Timeout
-   * response by the
-   * exception mapper.
+   * wrapping a {@link SQLTimeoutException}, which is later mapped to an HTTP 504
+   * Gateway Timeout response by the exception mapper.
    *
-   * @param title the unique title of the article
+   * @param title exact article title, matched case-insensitively
    * @return the article data transfer object containing all article fields
    * @throws NotFoundException    if no article exists with the given title
    * @throws PersistenceException if a database error occurs (including timeout)
@@ -82,7 +80,8 @@ public class ArticleService {
    * exception mapper.
    *
    * @param page the current page number in the query
-   * @param text text to search for in the headline (case-insensitive substring match; LIKE
+   * @param text text to search for in the headline (case-insensitive substring
+   *             match; LIKE
    *             wildcards {@code %} and {@code _} are treated literally)
    * @param tags list of tags the article must have (case-insensitive)
    * @throws PersistenceException if a database error occurs (including timeout)
@@ -108,10 +107,16 @@ public class ArticleService {
   }
 
   /**
-   * Removes a persisted article with the exact title match in the database.
+   * Deletes the article with the given title (case-insensitive exact match).
    *
-   * @param title title of the Article
-   * @return number of the deleted rows. It should be one or zero.
+   * <p>
+   * Database query timeouts are propagated as {@link PersistenceException}
+   * wrapping a {@link SQLTimeoutException}, which is later mapped to an HTTP 504
+   * Gateway Timeout response by the exception mapper.
+   *
+   * @param title exact article title, matched case-insensitively
+   * @return 1 if an article was deleted, 0 if no article matches
+   * @throws PersistenceException if a database error occurs (including timeout)
    */
   public long deleteArticleByTitle(String title) {
     return Article.deleteByTitle(title);

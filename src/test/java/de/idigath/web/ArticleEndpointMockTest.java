@@ -35,7 +35,7 @@ public class ArticleEndpointMockTest {
   ArticleService articleService;
 
   @Test
-  public void getArticle_serviceThrowsTimeout_returns504() {
+  void getArticle_serviceThrowsTimeout_returns504() {
 
     PersistenceException persistenceException = new PersistenceException(new SQLTimeoutException("Query timeout"));
 
@@ -46,7 +46,7 @@ public class ArticleEndpointMockTest {
   }
 
   @Test
-  public void deleteArticle_nonExistentTitle_returns404() {
+  void deleteArticle_nonExistentTitle_returns404() {
 
     Mockito.when(articleService.deleteArticleByTitle("no article"))
         .thenReturn(0L);
@@ -55,7 +55,7 @@ public class ArticleEndpointMockTest {
   }
 
   @Test
-  public void deleteArticle_existingTitle_returns204() {
+  void deleteArticle_existingTitle_returns204() {
     Mockito.when(articleService.deleteArticleByTitle("article title"))
         .thenReturn(1L);
 

@@ -19,16 +19,6 @@ public class ArticleServiceTest {
   @Inject
   ArticleService articleService;
 
-  private Article persistTestArticle(String title) {
-    Article article = new Article();
-    article.title = title;
-    article.logoUrl = "https://example.com/logos/sale.png";
-    article.summary = "My test article";
-    article.textContent = "My test article";
-    article.persist();
-    return article;
-  }
-
   @Test
   @TestTransaction
   void findArticleByTitle_existingTitleDifferentCase_returnsArticle() {
@@ -186,6 +176,16 @@ public class ArticleServiceTest {
     assertThat(result.totalArticles()).isEqualTo(1);
     assertThat(result.articleList()).hasSize(1);
     assertThat(result.articleList().get(0).title()).isEqualTo(title);
+  }
+
+  private Article persistTestArticle(String title) {
+    Article article = new Article();
+    article.title = title;
+    article.logoUrl = "https://example.com/logos/sale.png";
+    article.summary = "My test article";
+    article.textContent = "My test article";
+    article.persist();
+    return article;
   }
 
   @Test

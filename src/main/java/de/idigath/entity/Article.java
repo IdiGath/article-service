@@ -82,21 +82,22 @@ public class Article extends PanacheEntity {
   }
 
   /**
-   * Finds an article with the exact title match (case-insensitive).
+   * Finds the article with the given title (case-insensitive exact match).
    *
-   * @param title title of the Article
+   * @param title exact article title, matched case-insensitively
    * @return an Optional containing the article with the given title, or empty
-   *         if no article exists
+   *         if no article matches
    */
   public static Optional<Article> findByTitleOptional(String title) {
     return find("lower(title) = lower(?1)", title).firstResultOptional();
   }
 
   /**
-   * Deletes an article with the exact title match.
+   * Deletes the article with the given title (case-insensitive exact match).
+   * Runs in its own transaction.
    *
-   * @param title title of the Article
-   * @return number of the deleted rows. It should be one or zero.
+   * @param title exact article title, matched case-insensitively
+   * @return 1 if an article was deleted, 0 if no article matches
    */
   @Transactional
   public static long deleteByTitle(String title) {
@@ -122,6 +123,13 @@ public class Article extends PanacheEntity {
   /**
    * Article title to display at the beginning of the article and in the article
    * list.
+   *
+   * <p>
+   * Uniqueness is enforced by the database, not by this annotation: the V1
+   * migration creates the case-insensitive functional unique index
+   * {@code uq_articles_title_ci} on {@code lower(title)}. The {@code unique}
+   * attribute here only mirrors that intent for readers; Hibernate runs in
+   * {@code validate} mode and does not verify unique constraints.
    */
   @Column(length = 255, nullable = false, unique = true)
   public String title;

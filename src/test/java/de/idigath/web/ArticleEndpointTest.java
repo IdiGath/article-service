@@ -23,17 +23,17 @@ import org.junit.jupiter.api.Test;
 public class ArticleEndpointTest {
 
   @Test
-  public void getArticle_existingTitle_returns200() {
+  void getArticle_existingTitle_returns200() {
     when().get("/{title}", "NixOS for Java Developers").then().statusCode(200);
   }
 
   @Test
-  public void getArticle_nonExistentTitle_returns404() {
+  void getArticle_nonExistentTitle_returns404() {
     when().get("/" + "some-nonexistent-article-title").then().statusCode(404);
   }
 
   @Test
-  public void deleteArticle_existingTitle_returns204AndRemovesArticle() {
+  void deleteArticle_existingTitle_returns204AndRemovesArticle() {
     String title = "Endpoint delete test article";
     QuarkusTransaction.requiringNew().run(() -> {
       Article article = new Article();
@@ -49,12 +49,12 @@ public class ArticleEndpointTest {
   }
 
   @Test
-  public void deleteArticle_nonExistentTitle_returns404() {
+  void deleteArticle_nonExistentTitle_returns404() {
     when().delete("/" + "some-nonexistent-article-title").then().statusCode(404);
   }
 
   @Test
-  public void searchArticle_noParameters_returnsAllArticles() {
+  void searchArticle_noParameters_returnsAllArticles() {
     when()
         .get("/search")
         .then()
@@ -64,7 +64,7 @@ public class ArticleEndpointTest {
   }
 
   @Test
-  public void searchArticle_withPageParameter_returnsFirstPage() {
+  void searchArticle_withPageParameter_returnsFirstPage() {
     when()
         .get("/search?page=1")
         .then()
@@ -74,7 +74,7 @@ public class ArticleEndpointTest {
   }
 
   @Test
-  public void searchArticle_pageTwo_returnsEmptyListButTotalFive() {
+  void searchArticle_pageTwo_returnsEmptyListButTotalFive() {
     when()
         .get("/search?page=2")
         .then()
@@ -84,7 +84,7 @@ public class ArticleEndpointTest {
   }
 
   @Test
-  public void searchArticle_singleTagJava_returnsThreeArticles() {
+  void searchArticle_singleTagJava_returnsThreeArticles() {
     when()
         .get("/search?tag=Java")
         .then()
@@ -94,7 +94,7 @@ public class ArticleEndpointTest {
   }
 
   @Test
-  public void searchArticle_twoTagsJavaAndPerformance_returnsOneMatchingArticle() {
+  void searchArticle_twoTagsJavaAndPerformance_returnsOneMatchingArticle() {
     when()
         .get("/search?page=1&tag=Java&tag=Performance")
         .then()
@@ -105,7 +105,7 @@ public class ArticleEndpointTest {
   }
 
   @Test
-  public void searchArticle_textWithEncodedPercentSign_returnsNoArticles() {
+  void searchArticle_textWithEncodedPercentSign_returnsNoArticles() {
     when()
         .get("/search?text=%25")
         .then()

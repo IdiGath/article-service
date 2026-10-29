@@ -38,10 +38,11 @@ public class ArticleEndpoint {
   ArticleService articleService;
 
   /**
-   * Retrieves the article by its unique title.
+   * Retrieves the article with the given title.
    *
-   * @param title title as unique identifier of the article
-   * @return Article {@link ArticleDto} in json-format
+   * @param title exact article title, matched case-insensitively
+   * @return HTTP status 200 with the article as {@link ArticleDto} in JSON
+   *         format; 404 if no article with the given title exists
    */
   @GET
   @Path("/{title}")
@@ -60,7 +61,8 @@ public class ArticleEndpoint {
    *
    * @param page current page, if null then return first page
    * @param text the text query to search for in article titles (case-insensitive
-   *             substring match; LIKE wildcards {@code %} and {@code _} are treated
+   *             substring match; LIKE wildcards {@code %} and {@code _} are
+   *             treated
    *             literally). If {@code null}
    *             or empty, this parameter is ignored.
    * @param tags the list of tags to filter articles. An article must have all of
@@ -94,16 +96,17 @@ public class ArticleEndpoint {
   public RestResponse<Void> addArticle(ArticleDto article, @Context UriInfo uriinfo) {
     // TODO: Implement full CRUD — save article to DB
     // TODO: AI integration (Vikunja #45) — classify article (auto-tags/categories)
-    //   and spell-check without altering writing style before saving
+    // and spell-check without altering writing style before saving
     URI location = uriinfo.getAbsolutePathBuilder().path("42").build();
     return RestResponse.created(location);
   }
 
   /**
-   * Deletes the article by its unique title.
+   * Deletes the article with the given title.
    *
-   * @param title the title as unique identifier of the article
-   * @return HTTP-Status 204 in happy case
+   * @param title exact article title, matched case-insensitively
+   * @return HTTP status 204 if the article was deleted, 404 if no article
+   *         with the given title exists
    */
   @DELETE
   @Path("/{title}")
@@ -117,7 +120,7 @@ public class ArticleEndpoint {
    *
    * @param id      the unique identifier of the article
    * @param article new version of the article
-   * @return HTTP-Satus 200 with modified time and updated article version in body
+   * @return HTTP status 200 with modified time and updated article version in body
    */
   @PUT
   @Path("/{id}")
