@@ -3,6 +3,8 @@ package de.idigath.web;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.equalTo;
 
+import de.idigath.entity.Article;
+import io.quarkus.narayana.jta.QuarkusTransaction;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,27 @@ public class ArticleEndpointTest {
   @Test
   public void getArticle_nonExistentTitle_returns404() {
     when().get("/" + "some-nonexistent-article-title").then().statusCode(404);
+  }
+
+  @Test
+  public void deleteArticle_existingTitle_returns204AndRemovesArticle() {
+    String title = "Endpoint delete test article";
+    QuarkusTransaction.requiringNew().run(() -> {
+      Article article = new Article();
+      article.title = title;
+      article.logoUrl = "https://example.com/logos/delete-test.png";
+      article.summary = "Delete test summary";
+      article.textContent = "Delete test content";
+      article.persist();
+    });
+
+    when().delete("/{title}", title).then().statusCode(204);
+    when().get("/{title}", title).then().statusCode(404);
+  }
+
+  @Test
+  public void deleteArticle_nonExistentTitle_returns404() {
+    when().delete("/" + "some-nonexistent-article-title").then().statusCode(404);
   }
 
   @Test

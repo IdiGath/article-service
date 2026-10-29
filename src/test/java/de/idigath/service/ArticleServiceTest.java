@@ -188,4 +188,25 @@ public class ArticleServiceTest {
     assertThat(result.articleList().get(0).title()).isEqualTo(title);
   }
 
+  @Test
+  void deleteArticleByTitle_nonExistentTitle_nothingChanged() {
+    var firstSelect = articleService.searchArticleOverview(null, null, null);
+    articleService.deleteArticleByTitle("dsdfjsdfsdfj");
+    var secondSelect = articleService.searchArticleOverview(null, null, null);
+
+    assertThat(secondSelect.totalArticles()).isEqualTo(firstSelect.totalArticles());
+  }
+
+  @Test
+  @TestTransaction
+  void deleteArticleByTitle_existingTitle_minusOneArticle() {
+    persistTestArticle("Weekend test article: 100%");
+    var firstSelect = articleService.searchArticleOverview(null, null, null);
+    var expected = firstSelect.totalArticles() - 1;
+    articleService.deleteArticleByTitle("Weekend test article: 100%");
+    var secondSelect = articleService.searchArticleOverview(null, null, null);
+
+    assertThat(secondSelect.totalArticles()).isEqualTo(expected);
+  }
+
 }

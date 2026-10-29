@@ -106,4 +106,14 @@ public class ArticleService {
     var result = new ArticleOverview(articlePreviewList, articleQuery.count(), searchPage, articleQuery.pageCount());
     return result;
   }
+
+  /**
+   * Removes a persisted article with the exact title match in the database.
+   *
+   * @param title title of the Article
+   * @return number of the deleted rows. It should be one or zero.
+   */
+  public long deleteArticleByTitle(String title) {
+    return Article.deleteByTitle(title);
+  }
 }

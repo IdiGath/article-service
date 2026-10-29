@@ -44,4 +44,21 @@ public class ArticleEndpointMockTest {
 
     when().get("/{title}", "NixOS for Java Developers").then().statusCode(504);
   }
+
+  @Test
+  public void deleteArticle_nonExistentTitle_returns404() {
+
+    Mockito.when(articleService.deleteArticleByTitle("no article"))
+        .thenReturn(0L);
+
+    when().delete("/{title}", "no article").then().statusCode(404);
+  }
+
+  @Test
+  public void deleteArticle_existingTitle_returns204() {
+    Mockito.when(articleService.deleteArticleByTitle("article title"))
+        .thenReturn(1L);
+
+    when().delete("/{title}", "article title").then().statusCode(204);
+  }
 }

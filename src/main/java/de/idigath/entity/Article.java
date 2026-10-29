@@ -15,6 +15,7 @@ import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.transaction.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -89,6 +90,17 @@ public class Article extends PanacheEntity {
    */
   public static Optional<Article> findByTitleOptional(String title) {
     return find("lower(title) = lower(?1)", title).firstResultOptional();
+  }
+
+  /**
+   * Deletes an article with the exact title match.
+   *
+   * @param title title of the Article
+   * @return number of the deleted rows. It should be one or zero.
+   */
+  @Transactional
+  public static long deleteByTitle(String title) {
+    return delete("lower(title) = lower(?1)", title);
   }
 
   /**

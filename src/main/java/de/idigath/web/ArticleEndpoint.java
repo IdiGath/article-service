@@ -100,16 +100,16 @@ public class ArticleEndpoint {
   }
 
   /**
-   * Deletes the article by its unique identifier.
+   * Deletes the article by its unique title.
    *
-   * @param id the unique identifier of the article
-   * @return HTTP-Satus 204 in happy case
+   * @param title the title as unique identifier of the article
+   * @return HTTP-Status 204 in happy case
    */
   @DELETE
-  @Path("/{id}")
-  public RestResponse<Void> deleteArticle(@PathParam("id") int id) {
-    // TODO: Implement
-    return RestResponse.noContent();
+  @Path("/{title}")
+  public RestResponse<Void> deleteArticle(@PathParam("title") String title) {
+    var rows = articleService.deleteArticleByTitle(title);
+    return rows == 0 ? RestResponse.notFound() : RestResponse.noContent();
   }
 
   /**
