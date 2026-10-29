@@ -46,6 +46,7 @@ docker compose up -d
 | `make test` | Run unit and integration tests |
 | `make generate-dev-sql` | Generate the DevServices init SQL script |
 | `make clean-dev-sql` | Clean up generated SQL files |
+| `make reset-db` | Stop containers, delete database data and generated SQL (full reset) |
 
 ### Quick Start
 ```bash
