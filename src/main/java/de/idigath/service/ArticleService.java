@@ -37,11 +37,11 @@ import jakarta.ws.rs.NotFoundException;
 public class ArticleService {
 
   /**
-   * Retrieves an article by its unique identifier.
+   * Retrieves an article by its title as unique identifier.
    *
    * <p>
-   * If no article exists with the specified ID, a {@link NotFoundException} is
-   * thrown.
+   * If no article exists with the specified title, a {@link NotFoundException}
+   * is thrown.
    *
    * <p>
    * Database query timeouts are propagated as {@link PersistenceException}
@@ -50,14 +50,14 @@ public class ArticleService {
    * response by the
    * exception mapper.
    *
-   * @param id the unique identifier of the article
+   * @param title the unique title of the article
    * @return the article data transfer object containing all article fields
-   * @throws NotFoundException    if no article exists with the given ID
+   * @throws NotFoundException    if no article exists with the given title
    * @throws PersistenceException if a database error occurs (including timeout)
    */
-  public ArticleDto findArticleById(Long id) {
-    var article = Article.<Article>findByIdOptional(id)
-        .orElseThrow(() -> new NotFoundException("Article with id: " + id + " not found"));
+  public ArticleDto findArticleByTitle(String title) {
+    var article = Article.findByTitleOptional(title)
+        .orElseThrow(() -> new NotFoundException("Article with title: " + title + " not found"));
     ArticleDto result = ArticleMapper.INSTANCE.articleToArticleDto(article);
     return result;
   }

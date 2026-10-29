@@ -1,6 +1,7 @@
 package de.idigath.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 
@@ -10,12 +11,41 @@ import de.idigath.entity.Article;
 import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.NotFoundException;
 
 @QuarkusTest
 public class ArticleServiceTest {
 
   @Inject
   ArticleService articleService;
+
+  private Article persistTestArticle(String title) {
+    Article article = new Article();
+    article.title = title;
+    article.logoUrl = "https://example.com/logos/sale.png";
+    article.summary = "My test article";
+    article.textContent = "My test article";
+    article.persist();
+    return article;
+  }
+
+  @Test
+  @TestTransaction
+  void findArticleByTitle_existingTitleDifferentCase_returnsArticle() {
+    String title = "Weekend test article: 100%";
+    persistTestArticle(title);
+
+    var result = articleService.findArticleByTitle("weekend test article: 100%");
+
+    assertThat(result.title()).isEqualTo(title);
+  }
+
+  @Test
+  void findArticleByTitle_nonExistentTitle_throwsNotFoundException() {
+    assertThatThrownBy(() -> articleService.findArticleByTitle("no such article title"))
+        .isInstanceOf(NotFoundException.class)
+        .hasMessageContaining("no such article title");
+  }
 
   @Test
   void searchArticleOverview_nullParameters_returnsFirstPage() {
@@ -148,18 +178,14 @@ public class ArticleServiceTest {
   @Test
   @TestTransaction
   void searchArticleOverview_textWithPercentSign_returnsOnlyLiteralMatches() {
-    Article article = new Article();
-    article.title = "Weekend sale: 100% off";
-    article.logoUrl = "https://example.com/logos/sale.png";
-    article.summary = "Sale summary";
-    article.textContent = "Sale content";
-    article.persist();
+    String title = "Weekend test article: 100%";
+    persistTestArticle(title);
 
     var result = articleService.searchArticleOverview(1, "100%", null);
 
     assertThat(result.totalArticles()).isEqualTo(1);
     assertThat(result.articleList()).hasSize(1);
-    assertThat(result.articleList().get(0).title()).isEqualTo("Weekend sale: 100% off");
+    assertThat(result.articleList().get(0).title()).isEqualTo(title);
   }
 
 }

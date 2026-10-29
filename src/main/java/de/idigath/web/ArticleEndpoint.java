@@ -38,16 +38,16 @@ public class ArticleEndpoint {
   ArticleService articleService;
 
   /**
-   * Retrieves the article by its unique identifier.
+   * Retrieves the article by its unique title.
    *
-   * @param id the unique identifier of the article
+   * @param title title as unique identifier of the article
    * @return Article {@link ArticleDto} in json-format
    */
   @GET
-  @Path("/{id}")
+  @Path("/{title}")
   @Produces(MediaType.APPLICATION_JSON)
-  public RestResponse<ArticleDto> getArticle(@PathParam("id") Long id) {
-    var result = articleService.findArticleById(id);
+  public RestResponse<ArticleDto> getArticle(@PathParam("title") String title) {
+    var result = articleService.findArticleByTitle(title);
     return RestResponse.ok(result);
   }
 

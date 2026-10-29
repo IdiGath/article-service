@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -80,6 +81,17 @@ public class Article extends PanacheEntity {
   }
 
   /**
+   * Finds an article with the exact title match (case-insensitive).
+   *
+   * @param title title of the Article
+   * @return an Optional containing the article with the given title, or empty
+   *         if no article exists
+   */
+  public static Optional<Article> findByTitleOptional(String title) {
+    return find("lower(title) = lower(?1)", title).firstResultOptional();
+  }
+
+  /**
    * Escapes the LIKE escape character and wildcards ({@code %}, {@code _}) in
    * user input so they are matched literally instead of acting as pattern
    * wildcards. Uses {@code !} as the escape character.
@@ -99,7 +111,7 @@ public class Article extends PanacheEntity {
    * Article title to display at the beginning of the article and in the article
    * list.
    */
-  @Column(length = 255, nullable = false)
+  @Column(length = 255, nullable = false, unique = true)
   public String title;
 
   /**

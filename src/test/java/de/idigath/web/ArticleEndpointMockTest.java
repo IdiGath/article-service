@@ -39,8 +39,9 @@ public class ArticleEndpointMockTest {
 
     PersistenceException persistenceException = new PersistenceException(new SQLTimeoutException("Query timeout"));
 
-    Mockito.when(articleService.findArticleById(1L)).thenThrow(persistenceException);
+    Mockito.when(articleService.findArticleByTitle("NixOS for Java Developers"))
+        .thenThrow(persistenceException);
 
-    when().get("/" + "1").then().statusCode(504);
+    when().get("/{title}", "NixOS for Java Developers").then().statusCode(504);
   }
 }

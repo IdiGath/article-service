@@ -21,18 +21,13 @@ import org.junit.jupiter.api.Test;
 public class ArticleEndpointTest {
 
   @Test
-  public void getArticle_existingId_returns200() {
-    when().get("/" + "151").then().statusCode(200);
+  public void getArticle_existingTitle_returns200() {
+    when().get("/{title}", "NixOS for Java Developers").then().statusCode(200);
   }
 
   @Test
-  public void getArticle_nonExistentId_returns404() {
-    when().get("/" + "9999999").then().statusCode(404);
-  }
-
-  @Test
-  public void getArticle_nonNumericId_returns400() {
-    when().get("/" + "123A").then().statusCode(400);
+  public void getArticle_nonExistentTitle_returns404() {
+    when().get("/" + "some-nonexistent-article-title").then().statusCode(404);
   }
 
   @Test

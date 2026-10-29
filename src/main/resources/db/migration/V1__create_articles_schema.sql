@@ -10,3 +10,5 @@ CREATE TABLE IF NOT EXISTS public.articles (
 
 CREATE SEQUENCE IF NOT EXISTS public.articles_SEQ INCREMENT BY 50 OWNED BY public.articles.id;
 ALTER TABLE public.articles ALTER COLUMN id SET DEFAULT nextval('public.articles_SEQ');
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_articles_title_ci ON public.articles (lower(title));
