@@ -9,6 +9,8 @@ The project consists of:
 - **PostgreSQL Database** (Liquibase migrations in `src/main/resources/db/` and `./docker-compose.yml`)
 - **Quarkus service** for data processing and REST API
 
+Significant architectural decisions are recorded as ADRs in [docs/adr/](docs/adr/README.md).
+
 ## Key Features
 - **Article storage** in PostgreSQL (Markdown format)
 - **Article search** by title and tags (case-insensitive, supports multiple tags with AND logic)
