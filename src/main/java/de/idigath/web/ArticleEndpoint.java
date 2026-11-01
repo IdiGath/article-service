@@ -95,7 +95,7 @@ public class ArticleEndpoint {
   @Consumes(MediaType.APPLICATION_JSON)
   public RestResponse<Void> addArticle(ArticleDto article, @Context UriInfo uriinfo) {
     // TODO: Implement full CRUD — save article to DB
-    // TODO: AI integration (Vikunja #45) — classify article (auto-tags/categories)
+    // TODO: AI integration — classify article (auto-tags/categories)
     // and spell-check without altering writing style before saving
     URI location = uriinfo.getAbsolutePathBuilder().path("42").build();
     return RestResponse.created(location);

@@ -1,14 +1,14 @@
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'containeradmin') THEN
-        CREATE ROLE containeradmin WITH LOGIN PASSWORD '${DEV_LIQUIBASE_USER_PWD}';
+        CREATE ROLE containeradmin WITH LOGIN PASSWORD '${DEV_LIQUIBASE_USER_PASSWORD}';
     END IF;
 END $$;
 
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'articleservice') THEN
-        CREATE ROLE articleservice WITH LOGIN PASSWORD '${DEV_ARTICLE_SERVICE_USER_PWD}';
+        CREATE ROLE articleservice WITH LOGIN PASSWORD '${DEV_ARTICLE_SERVICE_USER_PASSWORD}';
     END IF;
 END $$;
 

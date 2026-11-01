@@ -18,7 +18,7 @@ The architecture is documented following the arc42 template in [docs/architectur
 - **Article deletion** by exact title match (case-insensitive)
 - **REST API** for content access
 - TODO **Create and update operations** (create, update articles)
-- TODO **AI-powered article classification and spell-checking** (on article creation via POST: auto-suggest tags/categories from content, check spelling without altering writing style — see Vikunja task)
+- TODO **AI-powered article classification and spell-checking** (on article creation via POST: auto-suggest tags/categories from content, check spelling without altering writing style)
 - TODO **Markdown-to-HTML parsing** (converts stored Markdown to HTML before returning it to the client)
 - TODO **Container image build** (wire up the generated Dockerfiles in `src/main/docker/` with make targets and documentation)
 - TODO **Set a numeric JaCoCo coverage target** (currently no threshold is enforced)
@@ -75,23 +75,25 @@ The service uses environment variables for database credentials. Copy `.env.exam
 
 | Variable | Description |
 |---|---|
-| `POSTGRES_PWD` | Password for the PostgreSQL superuser in the Docker container |
-| `DEV_ARTICLE_SERVICE_USER_PWD` | Password for the application database user |
-| `DEV_LIQUIBASE_USER_PWD` | Password for the Liquibase migration user |
+| `POSTGRES_PASSWORD` | Password for the PostgreSQL superuser in the Docker container |
+| `DEV_ARTICLE_SERVICE_USER_PASSWORD` | Password for the application database user |
+| `DEV_LIQUIBASE_USER_PASSWORD` | Password for the Liquibase migration user |
 
 **Prod profile:**
 
 | Variable | Description |
 |---|---|
-| `PROD_ARTICLE_SERVICE_USER_PWD` | Password for the application database user |
+| `PROD_ARTICLE_SERVICE_USER_PASSWORD` | Password for the application database user |
 | `PROD_LIQUIBASE_USER_PASSWORD` | Password for the Liquibase migration user |
+
+**Migrations:** Liquibase applies `db/migration/` in every profile. The `dev-data` seed (sample articles/tags from `db/dev/scripts/init-dev-data.sql`) is bound to Liquibase `context="dev"` and runs only in the dev profile (`%dev.quarkus.liquibase.contexts=dev`); prod (`%prod.quarkus.liquibase.contexts=prod`) executes schema migrations only — no seed data.
 
 Example `.env` for development:
 
 ```bash
-POSTGRES_PWD=postgrespassword
-DEV_ARTICLE_SERVICE_USER_PWD=devpassword
-DEV_LIQUIBASE_USER_PWD=liquibasepassword
+POSTGRES_PASSWORD=postgrespassword
+DEV_ARTICLE_SERVICE_USER_PASSWORD=devpassword
+DEV_LIQUIBASE_USER_PASSWORD=liquibasepassword
 ```
 
 ## OpenAPI
@@ -103,9 +105,8 @@ DEV_LIQUIBASE_USER_PWD=liquibasepassword
 - [Simplified Hibernate ORM with Panache](https://quarkus.io/guides/hibernate-orm-panache)
 - [Validation with Hibernate Validator](https://quarkus.io/guides/validation)
 - [Configure data sources in Quarkus](https://quarkus.io/guides/datasource)
-- [Writing REST Services with Quarkus REST (formerly RESTEasy Reactive)](https://quarkus.io/guides/rest)
+- [Writing REST Services with Quarkus REST (formerly RESTEasy Reactive)](https://quarkus.io/guides/rest) (incl. [Jackson serialization](https://quarkus.io/guides/rest#json-serialisation))
 - [Mapstruct](https://mapstruct.org/)
-- [Jackson serialization support for Quarkus REST](https://quarkus.io/guides/rest#json-serialisation)
 - [Using OpenAPI and Swagger UI in Quarkus](https://quarkus.io/guides/openapi-swaggerui)
 - [Testing Your Application in Quarkus](https://quarkus.io/guides/getting-started-testing)
 - [Continuous Testing in Quarkus](https://quarkus.io/guides/continuous-testing)
