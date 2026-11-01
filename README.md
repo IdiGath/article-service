@@ -9,7 +9,7 @@ The project consists of:
 - **PostgreSQL Database** (Liquibase migrations in `src/main/resources/db/` and `./docker-compose.yml`)
 - **Quarkus service** for data processing and REST API
 
-Significant architectural decisions are recorded as ADRs in [docs/adr/](docs/adr/README.md).
+The architecture is documented following the arc42 template in [docs/architecture/](docs/architecture/README.md); significant architectural decisions are recorded there in section 9.
 
 ## Key Features
 - **Article storage** in PostgreSQL (Markdown format)
@@ -21,6 +21,7 @@ Significant architectural decisions are recorded as ADRs in [docs/adr/](docs/adr
 - TODO **AI-powered article classification and spell-checking** (on article creation via POST: auto-suggest tags/categories from content, check spelling without altering writing style — see Vikunja task)
 - TODO **Markdown-to-HTML parsing** (converts stored Markdown to HTML before returning it to the client)
 - TODO **Container image build** (wire up the generated Dockerfiles in `src/main/docker/` with make targets and documentation)
+- TODO **Set a numeric JaCoCo coverage target** (currently no threshold is enforced)
 
 ## Workflow
 1. Articles are stored in the database as **Markdown**.
