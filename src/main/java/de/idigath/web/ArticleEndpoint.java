@@ -21,79 +21,94 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.reactive.RestResponse;
 
-/**
- * RESTful endpoint for managing articles and related entities. Provides CRUD
- * operations for
- * articles. Also supports operations with associated entities such as sources
- * and tags.
- */
 @Path("/api/articles")
-@Tag(name = "Articles", description = "Articles operations.")
+@Tag(name = "Articles", description = "Article operations: read, search, create, update, delete.")
 public class ArticleEndpoint {
 
   @Inject
   ArticleService articleService;
 
-  /**
-   * Retrieves the article with the given title.
-   *
-   * @param title exact article title, matched case-insensitively
-   * @return HTTP status 200 with the article as {@link ArticleDto} in JSON
-   *         format; 404 if no article with the given title exists
-   */
   @GET
   @Path("/{title}")
   @Produces(MediaType.APPLICATION_JSON)
-  public RestResponse<ArticleDto> getArticle(@PathParam("title") String title) {
+  @Operation(
+      summary = "Get an article by title",
+      description = "Exact title match, case-insensitive.")
+  @APIResponses({
+      @APIResponse(
+          responseCode = "200",
+          description = "Article found",
+          content = @Content(schema = @Schema(implementation = ArticleDto.class))),
+      @APIResponse(responseCode = "404", description = "No article with the given title"),
+      @APIResponse(
+          responseCode = "504",
+          description = "Database query timeout",
+          content = @Content(mediaType = "text/plain"))
+  })
+  public RestResponse<ArticleDto> getArticle(
+      @Parameter(description = "Exact article title, matched case-insensitively")
+      @PathParam("title") String title) {
     var result = articleService.findArticleByTitle(title);
     return RestResponse.ok(result);
   }
 
-  /**
-   * Searches for articles based on the provided query and/or tags. The search can
-   * be performed using
-   * a text query, one or more tags, or both. An article matches
-   * only if it has ALL of the given tags. If no articles match the criteria, an
-   * empty set is returned.
-   *
-   * @param page current page, if null then return first page
-   * @param text the text query to search for in article titles (case-insensitive
-   *             substring match; LIKE wildcards {@code %} and {@code _} are
-   *             treated
-   *             literally). If {@code null}
-   *             or empty, this parameter is ignored.
-   * @param tags the list of tags to filter articles. An article must have all of
-   *             them. If {@code null} or empty, this parameter is ignored.
-   * @return a list of {@link ArticleDto} objects matching the search criteria.
-   *         Returns an empty set
-   *         if no articles are found.
-   */
   @GET
   @Path("/search")
   @Produces(MediaType.APPLICATION_JSON)
+  @Operation(
+      summary = "Search articles by text and/or tags",
+      description = "Text query is a case-insensitive substring match on the title; "
+          + "LIKE wildcards % and _ are treated literally. An article matches only if it has "
+          + "ALL given tags (case-insensitive). Null/blank tags are ignored. "
+          + "Page is 1-based, page size is 10; null or non-positive page returns the first page. "
+          + "Returns an empty list when nothing matches.")
+  @APIResponses({
+      @APIResponse(
+          responseCode = "200",
+          description = "Matching articles (possibly an empty list)",
+          content = @Content(schema = @Schema(implementation = ArticleOverview.class))),
+      @APIResponse(
+          responseCode = "504",
+          description = "Database query timeout",
+          content = @Content(mediaType = "text/plain"))
+  })
   public RestResponse<ArticleOverview> searchArticle(
+      @Parameter(description = "1-based page number; null or non-positive returns the first page")
       @QueryParam("page") Integer page,
+      @Parameter(description = "Case-insensitive substring to match in the title; LIKE wildcards are literal")
       @QueryParam("text") String text,
+      @Parameter(description = "Tags the article must have all of (AND logic); null/blank entries ignored")
       @QueryParam("tag") List<String> tags) {
     var result = articleService.searchArticleOverview(page, text, tags);
     return RestResponse.ok(result);
   }
 
-  /**
-   * Creates a new article in the database. After resource creation responses with
-   * the URI to the
-   * new Resource.
-   *
-   * @param article new article from the api consumer
-   * @param uriinfo information to the current URI
-   * @return HTTP-Status 201 with location in the happy case
-   */
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
-  public RestResponse<Void> addArticle(ArticleDto article, @Context UriInfo uriinfo) {
+  @Operation(
+      summary = "Create an article",
+      description = "Currently a stub: responds 201 with a hardcoded Location header; "
+          + "the article is not persisted yet.")
+  @APIResponses({
+      @APIResponse(responseCode = "201", description = "Article created; Location header points to it"),
+      @APIResponse(responseCode = "400", description = "Malformed request body"),
+      @APIResponse(
+          responseCode = "504",
+          description = "Database query timeout",
+          content = @Content(mediaType = "text/plain"))
+  })
+  public RestResponse<Void> addArticle(
+      @Parameter(description = "New article payload") ArticleDto article,
+      @Context UriInfo uriinfo) {
     // TODO: Implement full CRUD — save article to DB
     // TODO: AI integration — classify article (auto-tags/categories)
     // and spell-check without altering writing style before saving
@@ -101,31 +116,48 @@ public class ArticleEndpoint {
     return RestResponse.created(location);
   }
 
-  /**
-   * Deletes the article with the given title.
-   *
-   * @param title exact article title, matched case-insensitively
-   * @return HTTP status 204 if the article was deleted, 404 if no article
-   *         with the given title exists
-   */
   @DELETE
   @Path("/{title}")
-  public RestResponse<Void> deleteArticle(@PathParam("title") String title) {
+  @Operation(
+      summary = "Delete an article by title",
+      description = "Exact title match, case-insensitive.")
+  @APIResponses({
+      @APIResponse(responseCode = "204", description = "Article deleted"),
+      @APIResponse(responseCode = "404", description = "No article with the given title"),
+      @APIResponse(
+          responseCode = "504",
+          description = "Database query timeout",
+          content = @Content(mediaType = "text/plain"))
+  })
+  public RestResponse<Void> deleteArticle(
+      @Parameter(description = "Exact article title, matched case-insensitively")
+      @PathParam("title") String title) {
     var rows = articleService.deleteArticleByTitle(title);
     return rows == 0 ? RestResponse.notFound() : RestResponse.noContent();
   }
 
-  /**
-   * Updates current article with the new version from the body.
-   *
-   * @param id      the unique identifier of the article
-   * @param article new version of the article
-   * @return HTTP status 200 with modified time and updated article version in body
-   */
   @PUT
   @Path("/{id}")
   @Consumes(MediaType.APPLICATION_JSON)
-  public RestResponse<ArticleDto> editArticle(@PathParam("id") int id, ArticleDto article) {
+  @Operation(
+      summary = "Update an article",
+      description = "Currently a stub: responds 200 with the request body echoed back and a "
+          + "Last-Modified header; nothing is persisted.")
+  @APIResponses({
+      @APIResponse(
+          responseCode = "200",
+          description = "Updated article with Last-Modified header",
+          content = @Content(schema = @Schema(implementation = ArticleDto.class))),
+      @APIResponse(responseCode = "400", description = "Id is not a number, or malformed request body"),
+      @APIResponse(
+          responseCode = "504",
+          description = "Database query timeout",
+          content = @Content(mediaType = "text/plain"))
+  })
+  public RestResponse<ArticleDto> editArticle(
+      @Parameter(description = "Article id; must be numeric (non-numeric yields 400)")
+      @PathParam("id") int id,
+      @Parameter(description = "New version of the article") ArticleDto article) {
     // TODO: Implement
     Date lastModified = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
     return RestResponse.ResponseBuilder.ok(article).lastModified(lastModified).build();
