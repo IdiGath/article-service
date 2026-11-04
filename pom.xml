@@ -19,6 +19,7 @@
     <jacoco.version>0.8.14</jacoco.version>
     <xml-bind.version>4.0.2</xml-bind.version>
     <org.mapstruct.version>1.6.3</org.mapstruct.version>
+    <assertj.version>3.27.3</assertj.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -84,6 +85,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-jacoco</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
       <version>${xml-bind.version}</version>
@@ -97,7 +103,7 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>3.27.3</version>
+      <version>${assertj.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
