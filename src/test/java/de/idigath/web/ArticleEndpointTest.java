@@ -38,14 +38,7 @@ public class ArticleEndpointTest {
   @Test
   void deleteArticle_existingTitle_returns204AndRemovesArticle() {
     String title = "Endpoint delete test article";
-    QuarkusTransaction.requiringNew().run(() -> {
-      Article article = new Article();
-      article.title = title;
-      article.logoUrl = "https://example.com/logos/delete-test.png";
-      article.summary = "Delete test summary";
-      article.textContent = "Delete test content";
-      article.persist();
-    });
+    persistTestArticle(title);
 
     when().delete("/{title}", title).then().statusCode(204);
     when().get("/{title}", title).then().statusCode(404);
@@ -120,27 +113,9 @@ public class ArticleEndpointTest {
   @Test
   void editArticle_existingTitle_returns200AndUpdatesArticle() {
     String title = "Endpoint edit test article";
-    QuarkusTransaction.requiringNew().run(() -> {
-      Article article = new Article();
-      article.title = title;
-      article.logoUrl = "https://example.com/logos/edit-test.png";
-      article.summary = "Original summary";
-      article.textContent = "Original content";
-      article.persist();
-    });
+    persistTestArticle(title);
 
-    String updatedBody = """
-        {
-          "title": "%s",
-          "logoUrl": "https://example.com/logos/edit-test.png",
-          "summary": "Updated summary",
-          "textContent": "Updated content",
-          "sources": [],
-          "tags": []
-        }
-        """.formatted(title);
-
-    given().contentType(ContentType.JSON).body(updatedBody)
+    given().contentType(ContentType.JSON).body(articleJson(title, "Updated summary"))
         .when().put("/{title}", title)
         .then().statusCode(200)
         .body("summary", equalTo("Updated summary"))
@@ -153,30 +128,16 @@ public class ArticleEndpointTest {
 
   @Test
   void editArticle_nonExistentTitle_returns404() {
-    String body = """
-        {
-          "title": "some-nonexistent-article-title",
-          "logoUrl": "https://example.com/logos/none.png",
-          "summary": "Summary",
-          "textContent": "Content",
-          "sources": [],
-          "tags": []
-        }
-        """;
+    String title = "some-nonexistent-article-title";
 
-    given().contentType(ContentType.JSON).body(body)
-        .when().put("/{title}", "some-nonexistent-article-title")
+    given().contentType(ContentType.JSON).body(articleJson(title, "Summary"))
+        .when().put("/{title}", title)
         .then().statusCode(404);
   }
 
   @Test
   void getArticle_tableLockedByOtherTransaction_returns504() {
-    QuarkusTransaction.requiringNew().run(() -> {
-      var em = Article.getEntityManager();
-      var db = (String) em.createNativeQuery("SELECT current_database()").getSingleResult();
-      em.createNativeQuery("ALTER DATABASE \"" + db + "\" SET statement_timeout = '1s'").executeUpdate();
-      em.createNativeQuery("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = current_database() AND pid <> pg_backend_pid()").getResultList();
-    });
+    setStatementTimeout("SET statement_timeout = '1s'");
 
     try {
       QuarkusTransaction.requiringNew().run(() -> {
@@ -187,13 +148,41 @@ public class ArticleEndpointTest {
         when().get("/{title}", "NixOS for Java Developers").then().statusCode(504);
       });
     } finally {
-      QuarkusTransaction.requiringNew().run(() -> {
-        var em = Article.getEntityManager();
-        var db = (String) em.createNativeQuery("SELECT current_database()").getSingleResult();
-        em.createNativeQuery("ALTER DATABASE \"" + db + "\" RESET statement_timeout").executeUpdate();
-        em.createNativeQuery("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = current_database() AND pid <> pg_backend_pid()").getResultList();
-      });
+      setStatementTimeout("RESET statement_timeout");
     }
+  }
+
+  private void persistTestArticle(String title) {
+    QuarkusTransaction.requiringNew().run(() -> {
+      Article article = new Article();
+      article.title = title;
+      article.logoUrl = "https://example.com/logos/test.png";
+      article.summary = "Test summary";
+      article.textContent = "Test content";
+      article.persist();
+    });
+  }
+
+  private String articleJson(String title, String summary) {
+    return """
+        {
+          "title": "%s",
+          "logoUrl": "https://example.com/logos/test.png",
+          "summary": "%s",
+          "textContent": "Test content",
+          "sources": [],
+          "tags": []
+        }
+        """.formatted(title, summary);
+  }
+
+  private void setStatementTimeout(String alterClause) {
+    QuarkusTransaction.requiringNew().run(() -> {
+      var em = Article.getEntityManager();
+      var db = (String) em.createNativeQuery("SELECT current_database()").getSingleResult();
+      em.createNativeQuery("ALTER DATABASE \"" + db + "\" " + alterClause).executeUpdate();
+      em.createNativeQuery("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = current_database() AND pid <> pg_backend_pid()").getResultList();
+    });
   }
 
 }
