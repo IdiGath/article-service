@@ -16,6 +16,7 @@ import de.idigath.model.ArticleOverview;
 import de.idigath.model.ArticlePreviewDto;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.PersistenceException;
+import jakarta.persistence.QueryTimeoutException;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 
@@ -86,8 +87,9 @@ public class ArticleService {
    *             match; LIKE
    *             wildcards {@code %} and {@code _} are treated literally)
    * @param tags list of tags the article must have (case-insensitive)
+   * @return the overview with matching article previews, total count and page info;
+   *         the preview list is empty when nothing matches
    * @throws PersistenceException if a database error occurs (including timeout)
-   *
    */
   public ArticleOverview searchArticleOverview(Integer page, String text, List<String> tags) {
     int searchPage = Objects.nonNull(page) ? page : 0;
@@ -184,13 +186,14 @@ public class ArticleService {
    * Deletes the article with the given title (case-insensitive exact match).
    *
    * <p>
-   * Database query timeouts are propagated as {@link QueryTimeoutException}, which is later mapped to an HTTP 504
-   * Gateway Timeout response by the exception mapper.
+   * Runs in its own transaction. Database query timeouts are propagated as {@link QueryTimeoutException},
+   * which is later mapped to an HTTP 504 Gateway Timeout response by the exception mapper.
    *
    * @param title exact article title, matched case-insensitively
    * @return 1 if an article was deleted, 0 if no article matches
    * @throws PersistenceException if a database error occurs (including timeout)
    */
+  @Transactional
   public long deleteArticleByTitle(String title) {
     return Article.deleteByTitle(title);
   }
