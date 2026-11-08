@@ -105,3 +105,4 @@ Thumbs.db
 .vscode/
 .qodo/
 postgres_data/
+.yoke/
