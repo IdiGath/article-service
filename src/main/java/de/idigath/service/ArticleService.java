@@ -49,8 +49,7 @@ public class ArticleService {
    * is thrown.
    *
    * <p>
-   * Database query timeouts are propagated as {@link PersistenceException}
-   * wrapping a {@link SQLTimeoutException}, which is later mapped to an HTTP 504
+   * Database query timeouts are propagated as {@link QueryTimeoutException}, which is later mapped to an HTTP 504
    * Gateway Timeout response by the exception mapper.
    *
    * @param title exact article title, matched case-insensitively
@@ -78,9 +77,7 @@ public class ArticleService {
    * are ignored. If the tag list is null or empty, the tag filter is not applied.
    *
    * <p>
-   * Database query timeouts are propagated as {@link PersistenceException}
-   * wrapping a {@link
-   * SQLTimeoutException}, which is later mapped to an HTTP 504 Gateway Timeout
+   * Database query timeouts are propagated as {@link QueryTimeoutException}, which is later mapped to an HTTP 504 Gateway Timeout
    * response by the
    * exception mapper.
    *
@@ -126,8 +123,7 @@ public class ArticleService {
    *
    * <p>
    * Runs in its own transaction. Database query timeouts are propagated as
-   * {@link PersistenceException}
-   * wrapping a {@link SQLTimeoutException}, which is later mapped to an HTTP 504
+   * {@link QueryTimeoutException}, which is later mapped to an HTTP 504
    * Gateway Timeout response
    * by the exception mapper.
    *
@@ -188,8 +184,7 @@ public class ArticleService {
    * Deletes the article with the given title (case-insensitive exact match).
    *
    * <p>
-   * Database query timeouts are propagated as {@link PersistenceException}
-   * wrapping a {@link SQLTimeoutException}, which is later mapped to an HTTP 504
+   * Database query timeouts are propagated as {@link QueryTimeoutException}, which is later mapped to an HTTP 504
    * Gateway Timeout response by the exception mapper.
    *
    * @param title exact article title, matched case-insensitively

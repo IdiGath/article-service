@@ -169,4 +169,31 @@ public class ArticleEndpointTest {
         .then().statusCode(404);
   }
 
+  @Test
+  void getArticle_tableLockedByOtherTransaction_returns504() {
+    QuarkusTransaction.requiringNew().run(() -> {
+      var em = Article.getEntityManager();
+      var db = (String) em.createNativeQuery("SELECT current_database()").getSingleResult();
+      em.createNativeQuery("ALTER DATABASE \"" + db + "\" SET statement_timeout = '1s'").executeUpdate();
+      em.createNativeQuery("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = current_database() AND pid <> pg_backend_pid()").getResultList();
+    });
+
+    try {
+      QuarkusTransaction.requiringNew().run(() -> {
+        Article.getEntityManager()
+            .createNativeQuery("LOCK TABLE articles IN ACCESS EXCLUSIVE MODE")
+            .executeUpdate();
+
+        when().get("/{title}", "NixOS for Java Developers").then().statusCode(504);
+      });
+    } finally {
+      QuarkusTransaction.requiringNew().run(() -> {
+        var em = Article.getEntityManager();
+        var db = (String) em.createNativeQuery("SELECT current_database()").getSingleResult();
+        em.createNativeQuery("ALTER DATABASE \"" + db + "\" RESET statement_timeout").executeUpdate();
+        em.createNativeQuery("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = current_database() AND pid <> pg_backend_pid()").getResultList();
+      });
+    }
+  }
+
 }
