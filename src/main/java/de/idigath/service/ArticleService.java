@@ -5,13 +5,18 @@ import java.util.List;
 import java.util.Objects;
 
 import de.idigath.entity.Article;
+import de.idigath.entity.Tag;
 import de.idigath.mapper.ArticleMapper;
+import de.idigath.mapper.TagMapper;
 import de.idigath.mapper.ArticlePreviewMapper;
+import de.idigath.mapper.SourceMapper;
 import de.idigath.model.ArticleDto;
+import de.idigath.model.SourceDto;
 import de.idigath.model.ArticleOverview;
 import de.idigath.model.ArticlePreviewDto;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.PersistenceException;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 
 /**
@@ -104,6 +109,79 @@ public class ArticleService {
     }
     var result = new ArticleOverview(articlePreviewList, articleQuery.count(), searchPage, articleQuery.pageCount());
     return result;
+  }
+
+  /**
+   * Updates the article with the given title (case-insensitive exact match) to
+   * the state from the DTO.
+   *
+   * <p>
+   * The article is looked up by {@code title}; if the DTO carries a different
+   * title, the article is
+   * renamed (a title already taken by another article violates the unique index).
+   * Sources are matched by
+   * exact URL: unchanged sources keep their id, new ones are created, missing
+   * ones are removed. Tags are
+   * resolved case-insensitively by name and reused across articles.
+   *
+   * <p>
+   * Runs in its own transaction. Database query timeouts are propagated as
+   * {@link PersistenceException}
+   * wrapping a {@link SQLTimeoutException}, which is later mapped to an HTTP 504
+   * Gateway Timeout response
+   * by the exception mapper.
+   *
+   * @param articleDto new state of the article
+   * @param title   exact title of the article to update, matched
+   *                   case-insensitively
+   * @return the updated article as DTO
+   * @throws NotFoundException    if no article exists with the given title
+   * @throws PersistenceException if a database error occurs (including timeout)
+   */
+  @Transactional
+  public ArticleDto editArticle(ArticleDto articleDto, String title) {
+    var article = Article.findByTitleOptional(title)
+        .orElseThrow(() -> new NotFoundException("Article with title: " + title + " not found"));
+
+    article.title = articleDto.title();
+    article.logoUrl = articleDto.logoUrl();
+    article.summary = articleDto.summary();
+    article.textContent = articleDto.textContent();
+
+    editArticleSources(article, articleDto);
+    editArticleTags(article, articleDto);
+    Article.flush();
+    return ArticleMapper.INSTANCE.articleToArticleDto(article);
+  }
+
+  private void editArticleSources(Article article, ArticleDto articleDto) {
+    var sourceDtoUrls = articleDto.sources().stream().map(SourceDto::url).toList();
+    article.sources.removeIf(s -> !sourceDtoUrls.contains(s.url));
+    for (var sourceDto : articleDto.sources()) {
+      var existingSource = article.sources.stream()
+          .filter(s -> s.url.equals(sourceDto.url()))
+          .findFirst()
+          .orElseGet(() -> {
+            var source = SourceMapper.INSTANCE.sourceDtoToSource(sourceDto);
+            source.article = article;
+            article.sources.add(source);
+            return source;
+          });
+      existingSource.title = sourceDto.title();
+      existingSource.citation = sourceDto.citation();
+    }
+  }
+
+  private void editArticleTags(Article article, ArticleDto articleDto) {
+    article.tags.clear();
+    for (var tagDto : articleDto.tags()) {
+      var existingTag = Tag.findByNameOptional(tagDto.name()).orElseGet(() -> {
+        var tag = TagMapper.INSTANCE.tagDtoToTag(tagDto);
+        article.tags.add(tag);
+        return tag;
+      });
+      article.tags.add(existingTag);
+    }
   }
 
   /**
