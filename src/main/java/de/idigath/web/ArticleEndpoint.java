@@ -116,7 +116,6 @@ public class ArticleEndpoint {
   public RestResponse<ArticleDto> editArticle(
       @Parameter(description = "Exact article title, matched case-insensitively") @PathParam("title") String title,
       @Parameter(description = "New version of the article") ArticleDto article) {
-    // TODO: Implement
     var result = articleService.editArticle(article, title);
     Date updatedAt = Date.from(result.updatedAt().atZone(ZoneId.systemDefault()).toInstant());
     return RestResponse.ResponseBuilder.ok(result).lastModified(updatedAt).build();

@@ -3,6 +3,8 @@ package de.idigath.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,9 @@ import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.NotFoundException;
+import de.idigath.model.ArticleDto;
+import de.idigath.model.SourceDto;
+import de.idigath.model.TagDto;
 
 @QuarkusTest
 public class ArticleServiceTest {
@@ -207,6 +212,40 @@ public class ArticleServiceTest {
     var secondSelect = articleService.searchArticleOverview(null, null, null);
 
     assertThat(secondSelect.totalArticles()).isEqualTo(expected);
+  }
+
+  @Test
+  @TestTransaction
+  void editArticle_existingTitle_updateArticle() {
+    var title = "Weekend test article: 100%";
+    var newSummary = "Another Summary";
+    var article = persistTestArticle(title);
+    var articleDto = new ArticleDto(article.title,
+        article.logoUrl,
+        newSummary,
+        article.textContent,
+        article.createdAt,
+        article.updatedAt,
+        new HashSet<SourceDto>(),
+        new HashSet<TagDto>());
+    var result = articleService.editArticle(articleDto, title);
+    assertThat(newSummary).isEqualTo(result.summary());
+  }
+
+  @Test
+  @TestTransaction
+  void editArticle_notExistingTitle_notFoundException() {
+    var title = "Weekend test article: 100%";
+    var articleDto = new ArticleDto(title,
+        "url",
+        "Another Summary",
+        "text",
+        LocalDateTime.now(),
+        LocalDateTime.now(),
+        new HashSet<SourceDto>(),
+        new HashSet<TagDto>());
+
+    assertThatThrownBy(() -> articleService.editArticle(articleDto, title)).isInstanceOf(NotFoundException.class);
   }
 
 }

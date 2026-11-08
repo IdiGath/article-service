@@ -1,12 +1,15 @@
 package de.idigath.web;
 
+import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
 import de.idigath.entity.Article;
 import io.quarkus.narayana.jta.QuarkusTransaction;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -112,6 +115,58 @@ public class ArticleEndpointTest {
         .statusCode(200)
         .body("totalArticles", equalTo(0))
         .body("articleList.size()", equalTo(0));
+  }
+
+  @Test
+  void editArticle_existingTitle_returns200AndUpdatesArticle() {
+    String title = "Endpoint edit test article";
+    QuarkusTransaction.requiringNew().run(() -> {
+      Article article = new Article();
+      article.title = title;
+      article.logoUrl = "https://example.com/logos/edit-test.png";
+      article.summary = "Original summary";
+      article.textContent = "Original content";
+      article.persist();
+    });
+
+    String updatedBody = """
+        {
+          "title": "%s",
+          "logoUrl": "https://example.com/logos/edit-test.png",
+          "summary": "Updated summary",
+          "textContent": "Updated content",
+          "sources": [],
+          "tags": []
+        }
+        """.formatted(title);
+
+    given().contentType(ContentType.JSON).body(updatedBody)
+        .when().put("/{title}", title)
+        .then().statusCode(200)
+        .body("summary", equalTo("Updated summary"))
+        .header("Last-Modified", notNullValue());
+
+    when().get("/{title}", title).then().statusCode(200).body("summary", equalTo("Updated summary"));
+
+    when().delete("/{title}", title).then().statusCode(204);
+  }
+
+  @Test
+  void editArticle_nonExistentTitle_returns404() {
+    String body = """
+        {
+          "title": "some-nonexistent-article-title",
+          "logoUrl": "https://example.com/logos/none.png",
+          "summary": "Summary",
+          "textContent": "Content",
+          "sources": [],
+          "tags": []
+        }
+        """;
+
+    given().contentType(ContentType.JSON).body(body)
+        .when().put("/{title}", "some-nonexistent-article-title")
+        .then().statusCode(404);
   }
 
 }
