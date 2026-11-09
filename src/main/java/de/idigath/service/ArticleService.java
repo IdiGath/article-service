@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import de.idigath.entity.Article;
+import de.idigath.entity.Source;
 import de.idigath.entity.Tag;
 import de.idigath.mapper.ArticleMapper;
 import de.idigath.mapper.TagMapper;
@@ -158,19 +159,23 @@ public class ArticleService {
   private void editArticleSources(Article article, ArticleDto articleDto) {
     var sourceDtoUrls = articleDto.sources().stream().map(SourceDto::url).toList();
     article.sources.removeIf(s -> !sourceDtoUrls.contains(s.url));
+    // New sources are collected separately and added only after the loop, so the
+    // collection is never mutated while a stream over it is still in progress.
+    var newSources = new LinkedList<Source>();
     for (var sourceDto : articleDto.sources()) {
       var existingSource = article.sources.stream()
           .filter(s -> s.url.equals(sourceDto.url()))
           .findFirst()
-          .orElseGet(() -> {
-            var source = SourceMapper.INSTANCE.sourceDtoToSource(sourceDto);
-            source.article = article;
-            article.sources.add(source);
-            return source;
-          });
+          .orElse(null);
+      if (Objects.isNull(existingSource)) {
+        existingSource = SourceMapper.INSTANCE.sourceDtoToSource(sourceDto);
+        existingSource.article = article;
+        newSources.add(existingSource);
+      }
       existingSource.title = sourceDto.title();
       existingSource.citation = sourceDto.citation();
     }
+    article.sources.addAll(newSources);
   }
 
   private void editArticleTags(Article article, ArticleDto articleDto) {

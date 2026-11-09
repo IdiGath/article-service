@@ -11,6 +11,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import de.idigath.entity.Article;
+import de.idigath.entity.Source;
 import de.idigath.entity.Tag;
 import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
@@ -264,6 +265,32 @@ public class ArticleServiceTest {
     assertThat(result.tags()).hasSize(1);
     assertThat(result.tags().iterator().next().name()).isEqualToIgnoringCase("neu");
     assertThat(Tag.count("lower(name) = lower(?1)", "neu")).isEqualTo(1);
+  }
+
+  @Test
+  @TestTransaction
+  void editArticle_newSourceUrl_addsAndPersistsNewSource() {
+    var title = "Source add test article";
+    var article = persistTestArticle(title);
+    var oldSource = new Source();
+    oldSource.article = article;
+    oldSource.title = "Old source";
+    oldSource.url = "https://example.com/old";
+    oldSource.citation = "old citation";
+    article.sources.add(oldSource);
+    var newSourceDto = new SourceDto("New source", "https://example.com/new", "new citation");
+    var articleDto = new ArticleDto(article.title, article.logoUrl, article.summary, article.textContent,
+        article.createdAt, article.updatedAt,
+        new HashSet<>(Set.of(new SourceDto("Old source", "https://example.com/old", "old citation"), newSourceDto)),
+        new HashSet<TagDto>());
+
+    var result = articleService.editArticle(articleDto, title);
+
+    assertThat(result.sources()).hasSize(2);
+    assertThat(result.sources().stream().map(SourceDto::url).toList())
+        .containsExactlyInAnyOrder("https://example.com/old", "https://example.com/new");
+    assertThat(Source.count("url = ?1", "https://example.com/new")).isEqualTo(1);
+    assertThat(Source.count("url = ?1", "https://example.com/old")).isEqualTo(1);
   }
 
 }
