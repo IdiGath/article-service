@@ -1,8 +1,10 @@
 package de.idigath.service;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import de.idigath.entity.Article;
 import de.idigath.entity.Tag;
@@ -121,7 +123,8 @@ public class ArticleService {
    * Sources are matched by
    * exact URL: unchanged sources keep their id, new ones are created, missing
    * ones are removed. Tags are
-   * resolved case-insensitively by name and reused across articles.
+   * resolved case-insensitively by name and reused across articles; duplicate names
+   * in the DTO (matched case-insensitively) are applied only once.
    *
    * <p>
    * Runs in its own transaction. Database query timeouts are propagated as
@@ -172,13 +175,18 @@ public class ArticleService {
 
   private void editArticleTags(Article article, ArticleDto articleDto) {
     article.tags.clear();
-    for (var tagDto : articleDto.tags()) {
-      var existingTag = Tag.findByNameOptional(tagDto.name()).orElseGet(() -> {
-        var tag = TagMapper.INSTANCE.tagDtoToTag(tagDto);
-        article.tags.add(tag);
-        return tag;
-      });
-      article.tags.add(existingTag);
+    var distinctTagDtos = articleDto.tags().stream()
+        .filter(tagDto -> Objects.nonNull(tagDto.name()))
+        .collect(Collectors.toMap(
+            tagDto -> tagDto.name().toLowerCase(),
+            tagDto -> tagDto,
+            (first, duplicate) -> first,
+            LinkedHashMap::new))
+        .values();
+    for (var tagDto : distinctTagDtos) {
+      var tag = Tag.findByNameOptional(tagDto.name())
+          .orElseGet(() -> TagMapper.INSTANCE.tagDtoToTag(tagDto));
+      article.tags.add(tag);
     }
   }
 

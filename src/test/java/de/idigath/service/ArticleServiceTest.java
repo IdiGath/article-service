@@ -6,10 +6,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
 import de.idigath.entity.Article;
+import de.idigath.entity.Tag;
 import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
@@ -246,6 +248,22 @@ public class ArticleServiceTest {
         new HashSet<TagDto>());
 
     assertThatThrownBy(() -> articleService.editArticle(articleDto, title)).isInstanceOf(NotFoundException.class);
+  }
+
+  @Test
+  @TestTransaction
+  void editArticle_duplicateTagNamesDifferentCase_persistsSingleTag() {
+    var title = "Tag dedupe test article";
+    var article = persistTestArticle(title);
+    Set<TagDto> tags = new HashSet<>(List.of(new TagDto("Neu"), new TagDto("neu"), new TagDto("NEU")));
+    var articleDto = new ArticleDto(article.title, article.logoUrl, article.summary, article.textContent,
+        article.createdAt, article.updatedAt, new HashSet<SourceDto>(), tags);
+
+    var result = articleService.editArticle(articleDto, title);
+
+    assertThat(result.tags()).hasSize(1);
+    assertThat(result.tags().iterator().next().name()).isEqualToIgnoringCase("neu");
+    assertThat(Tag.count("lower(name) = lower(?1)", "neu")).isEqualTo(1);
   }
 
 }
