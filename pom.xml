@@ -170,7 +170,11 @@
           <excludes> 
             <exclude>de/idigath/entity/**</exclude>
             <exclude>de/idigath/mapper/**/*Impl.class</exclude>
-          </excludes>    
+          </excludes>
+          <dataFileIncludes>
+            <dataFileInclude>${project.build.directory}/jacoco.exec</dataFileInclude>
+            <dataFileInclude>${project.build.directory}/jacoco-quarkus.exec</dataFileInclude>
+          </dataFileIncludes>
         </configuration>
         <executions>
           <!-- Start JaCoCo agent for the test-phase -->
