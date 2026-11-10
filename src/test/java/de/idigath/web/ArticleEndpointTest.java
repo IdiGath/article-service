@@ -2,7 +2,9 @@ package de.idigath.web;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 
@@ -156,6 +158,72 @@ public class ArticleEndpointTest {
     when().get("/{title}", title)
         .then().statusCode(200)
         .body("createdAt", equalTo(createdAtBefore));
+
+    when().delete("/{title}", title).then().statusCode(204);
+  }
+
+  @Test
+  void editArticle_missingTitle_returns400AndLeavesArticleUnchanged() {
+    String title = "Endpoint validation title test article";
+    persistTestArticle(title);
+
+    String bodyWithoutTitle = """
+        {
+          "logoUrl": "https://example.com/logos/test.png",
+          "summary": "Summary",
+          "textContent": "Test content",
+          "sources": [],
+          "tags": []
+        }
+        """;
+    given().contentType(ContentType.JSON).body(bodyWithoutTitle)
+        .when().put("/{title}", title)
+        .then().statusCode(400)
+        .body("errors", hasItem(containsString("title")));
+
+    when().get("/{title}", title)
+        .then().statusCode(200)
+        .body("title", equalTo(title))
+        .body("summary", equalTo("Test summary"));
+
+    when().delete("/{title}", title).then().statusCode(204);
+  }
+
+  @Test
+  void editArticle_tooLongSummary_returns400AndLeavesArticleUnchanged() {
+    String title = "Endpoint validation summary test article";
+    persistTestArticle(title);
+
+    given().contentType(ContentType.JSON).body(articleJson(title, "x".repeat(501)))
+        .when().put("/{title}", title)
+        .then().statusCode(400)
+        .body("errors", hasItem(containsString("summary")));
+
+    when().get("/{title}", title)
+        .then().statusCode(200)
+        .body("summary", equalTo("Test summary"));
+
+    when().delete("/{title}", title).then().statusCode(204);
+  }
+
+  @Test
+  void editArticle_nullSources_returns400() {
+    String title = "Endpoint validation sources test article";
+    persistTestArticle(title);
+
+    String bodyWithoutSources = """
+        {
+          "title": "%s",
+          "logoUrl": "https://example.com/logos/test.png",
+          "summary": "Summary",
+          "textContent": "Test content",
+          "tags": []
+        }
+        """.formatted(title);
+    given().contentType(ContentType.JSON).body(bodyWithoutSources)
+        .when().put("/{title}", title)
+        .then().statusCode(400)
+        .body("errors", hasItem(containsString("sources")));
 
     when().delete("/{title}", title).then().statusCode(204);
   }

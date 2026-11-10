@@ -4,6 +4,7 @@ import de.idigath.model.ArticleDto;
 import de.idigath.model.ArticleOverview;
 import de.idigath.service.ArticleService;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -77,11 +78,11 @@ public class ArticleEndpoint {
       + "the article is not persisted yet.")
   @APIResponses({
       @APIResponse(responseCode = "201", description = "Article created; Location header points to it"),
-      @APIResponse(responseCode = "400", description = "Malformed request body"),
+      @APIResponse(responseCode = "400", description = "Malformed request body or failed validation; response body lists the invalid fields"),
       @APIResponse(responseCode = "504", description = "Database query timeout", content = @Content(mediaType = "text/plain"))
   })
   public RestResponse<Void> addArticle(
-      @Parameter(description = "New article payload") ArticleDto article,
+      @Parameter(description = "New article payload") @Valid ArticleDto article,
       @Context UriInfo uriinfo) {
     // TODO: Implement full CRUD — save article to DB
     // TODO: AI integration — classify article (auto-tags/categories)
@@ -110,12 +111,13 @@ public class ArticleEndpoint {
   @Operation(summary = "Update an article", description = "Updates an article with an exact title match, case insensitive. Responds with 200 and last-Modified header.")
   @APIResponses({
       @APIResponse(responseCode = "200", description = "Updated article with Last-Modified header", content = @Content(schema = @Schema(implementation = ArticleDto.class))),
+      @APIResponse(responseCode = "400", description = "Request body failed validation; response body lists the invalid fields"),
       @APIResponse(responseCode = "404", description = "No article with this title"),
       @APIResponse(responseCode = "504", description = "Database query timeout", content = @Content(mediaType = "text/plain"))
   })
   public RestResponse<ArticleDto> editArticle(
       @Parameter(description = "Exact article title, matched case-insensitively") @PathParam("title") String title,
-      @Parameter(description = "New version of the article") ArticleDto article) {
+      @Parameter(description = "New version of the article") @Valid ArticleDto article) {
     var result = articleService.editArticle(article, title);
     Date updatedAt = Date.from(result.updatedAt().atZone(ZoneId.systemDefault()).toInstant());
     return RestResponse.ResponseBuilder.ok(result).lastModified(updatedAt).build();
