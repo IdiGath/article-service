@@ -21,7 +21,6 @@ The architecture is documented following the arc42 template in [docs/architectur
 - TODO **AI-powered article classification and spell-checking** (on article creation via POST: auto-suggest tags/categories from content, check spelling without altering writing style)
 - TODO **Markdown-to-HTML parsing** (converts stored Markdown to HTML before returning it to the client)
 - TODO **Container image build** (wire up the generated Dockerfiles in `src/main/docker/` with make targets and documentation)
-- TODO **Set a numeric JaCoCo coverage target** (currently no threshold is enforced)
 
 ## Workflow
 1. Articles are stored in the database as **Markdown**.
