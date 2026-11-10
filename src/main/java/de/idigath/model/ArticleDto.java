@@ -3,11 +3,16 @@ package de.idigath.model;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
 /**
  * Immutable data transfer object representing an article for API consumption.
  *
- * <p>This record decouples the API contract from the persistence model, preventing
- * database-specific concerns (e.g., Hibernate lazy loading, entity relationships) from affecting
+ * <p>
+ * This record decouples the API contract from the persistence model, preventing
+ * database-specific concerns (e.g., Hibernate lazy loading, entity
+ * relationships) from affecting
  * clients. All temporal fields use the server's local time zone.
  */
 public record ArticleDto(
@@ -15,7 +20,8 @@ public record ArticleDto(
     String logoUrl,
     String summary,
     String textContent,
-    LocalDateTime createdAt,
-    LocalDateTime updatedAt,
+    @JsonProperty(access = Access.READ_ONLY) LocalDateTime createdAt,
+    @JsonProperty(access = Access.READ_ONLY) LocalDateTime updatedAt,
     Set<SourceDto> sources,
-    Set<TagDto> tags) {}
+    Set<TagDto> tags) {
+}

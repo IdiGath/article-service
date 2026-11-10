@@ -3,6 +3,7 @@ package de.idigath.web;
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 
 import de.idigath.entity.Article;
@@ -136,6 +137,30 @@ public class ArticleEndpointTest {
   }
 
   @Test
+  void editArticle_timestampsInRequestBody_returnsServerManagedTimestamps() {
+    String title = "Endpoint edit timestamps test article";
+    persistTestArticle(title);
+
+    String createdAtBefore = when().get("/{title}", title)
+        .then().statusCode(200)
+        .extract().path("createdAt");
+
+    String foreignTimestamp = "2000-01-01T00:00:00";
+    given().contentType(ContentType.JSON).body(articleJson(title, "Updated summary", foreignTimestamp))
+        .when().put("/{title}", title)
+        .then().statusCode(200)
+        .body("createdAt", equalTo(createdAtBefore))
+        .body("updatedAt", not(equalTo(foreignTimestamp)))
+        .header("Last-Modified", notNullValue());
+
+    when().get("/{title}", title)
+        .then().statusCode(200)
+        .body("createdAt", equalTo(createdAtBefore));
+
+    when().delete("/{title}", title).then().statusCode(204);
+  }
+
+  @Test
   void getArticle_tableLockedByOtherTransaction_returns504() {
     setStatementTimeout("SET statement_timeout = '1s'");
 
@@ -174,6 +199,21 @@ public class ArticleEndpointTest {
           "tags": []
         }
         """.formatted(title, summary);
+  }
+
+  private String articleJson(String title, String summary, String timestamp) {
+    return """
+        {
+          "title": "%s",
+          "logoUrl": "https://example.com/logos/test.png",
+          "summary": "%s",
+          "textContent": "Test content",
+          "createdAt": "%s",
+          "updatedAt": "%s",
+          "sources": [],
+          "tags": []
+        }
+        """.formatted(title, summary, timestamp, timestamp);
   }
 
   private void setStatementTimeout(String alterClause) {
