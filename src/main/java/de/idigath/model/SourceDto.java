@@ -12,6 +12,6 @@ import jakarta.validation.constraints.Size;
  * clients. Alle temporal fields use the server's local time zone.
  */
 public record SourceDto(
-    @NotNull @Size(max = 255) String title,
-    @NotBlank @Size(max = 255) String url,
-    @NotNull String citation) {}
+        @NotNull @Size(max = 255) String title,
+        @NotBlank @Size(max = 255) String url,
+        @NotNull String citation) {}

@@ -24,10 +24,10 @@ import jakarta.ws.rs.ext.Provider;
 @Provider
 public class QueryTimeoutExceptionMapper implements ExceptionMapper<QueryTimeoutException> {
 
-  @Override
-  public Response toResponse(QueryTimeoutException exception) {
-    return Response.status(Response.Status.GATEWAY_TIMEOUT) // 504
-        .entity("Database timeout: " + exception.getMessage())
-        .build();
-  }
+    @Override
+    public Response toResponse(QueryTimeoutException exception) {
+        return Response.status(Response.Status.GATEWAY_TIMEOUT) // 504
+                .entity("Database timeout: " + exception.getMessage())
+                .build();
+    }
 }

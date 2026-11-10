@@ -3,298 +3,321 @@ package de.idigath.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.junit.jupiter.api.Test;
-
 import de.idigath.entity.Article;
 import de.idigath.entity.Source;
 import de.idigath.entity.Tag;
+import de.idigath.model.ArticleDto;
+import de.idigath.model.SourceDto;
+import de.idigath.model.TagDto;
 import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.NotFoundException;
-import de.idigath.model.ArticleDto;
-import de.idigath.model.SourceDto;
-import de.idigath.model.TagDto;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import org.junit.jupiter.api.Test;
 
 @QuarkusTest
 public class ArticleServiceTest {
 
-  @Inject
-  ArticleService articleService;
+    @Inject ArticleService articleService;
 
-  @Test
-  @TestTransaction
-  void findArticleByTitle_existingTitleDifferentCase_returnsArticle() {
-    String title = "Weekend test article: 100%";
-    persistTestArticle(title);
+    @Test
+    @TestTransaction
+    void findArticleByTitle_existingTitleDifferentCase_returnsArticle() {
+        String title = "Weekend test article: 100%";
+        persistTestArticle(title);
 
-    var result = articleService.findArticleByTitle("weekend test article: 100%");
+        var result = articleService.findArticleByTitle("weekend test article: 100%");
 
-    assertThat(result.title()).isEqualTo(title);
-  }
+        assertThat(result.title()).isEqualTo(title);
+    }
 
-  @Test
-  void findArticleByTitle_nonExistentTitle_throwsNotFoundException() {
-    assertThatThrownBy(() -> articleService.findArticleByTitle("no such article title"))
-        .isInstanceOf(NotFoundException.class)
-        .hasMessageContaining("no such article title");
-  }
+    @Test
+    void findArticleByTitle_nonExistentTitle_throwsNotFoundException() {
+        assertThatThrownBy(() -> articleService.findArticleByTitle("no such article title"))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("no such article title");
+    }
 
-  @Test
-  void searchArticleOverview_nullParameters_returnsFirstPage() {
-    var result = articleService.searchArticleOverview(null, null, null);
+    @Test
+    void searchArticleOverview_nullParameters_returnsFirstPage() {
+        var result = articleService.searchArticleOverview(null, null, null);
 
-    assertThat(result.totalArticles()).isEqualTo(5);
-    assertThat(result.articleList()).hasSize(5);
-    assertThat(result.currentPage()).isEqualTo(1);
-  }
+        assertThat(result.totalArticles()).isEqualTo(5);
+        assertThat(result.articleList()).hasSize(5);
+        assertThat(result.currentPage()).isEqualTo(1);
+    }
 
-  @Test
-  void searchArticleOverview_negativePage_returnsFirstPage() {
-    var result = articleService.searchArticleOverview(-1, null, null);
+    @Test
+    void searchArticleOverview_negativePage_returnsFirstPage() {
+        var result = articleService.searchArticleOverview(-1, null, null);
 
-    assertThat(result.totalArticles()).isEqualTo(5);
-    assertThat(result.articleList()).hasSize(5);
-    assertThat(result.currentPage()).isEqualTo(1);
-  }
+        assertThat(result.totalArticles()).isEqualTo(5);
+        assertThat(result.articleList()).hasSize(5);
+        assertThat(result.currentPage()).isEqualTo(1);
+    }
 
-  @Test
-  void searchArticleOverview_pageOne_returnsFirstPage() {
-    var result = articleService.searchArticleOverview(1, null, null);
+    @Test
+    void searchArticleOverview_pageOne_returnsFirstPage() {
+        var result = articleService.searchArticleOverview(1, null, null);
 
-    assertThat(result.totalArticles()).isEqualTo(5);
-    assertThat(result.articleList()).hasSize(5);
-    assertThat(result.currentPage()).isEqualTo(1);
-  }
+        assertThat(result.totalArticles()).isEqualTo(5);
+        assertThat(result.articleList()).hasSize(5);
+        assertThat(result.currentPage()).isEqualTo(1);
+    }
 
-  @Test
-  void searchArticleOverview_pageTwo_returnsEmptyList() {
-    var result = articleService.searchArticleOverview(2, null, null);
+    @Test
+    void searchArticleOverview_pageTwo_returnsEmptyList() {
+        var result = articleService.searchArticleOverview(2, null, null);
 
-    assertThat(result.totalArticles()).isEqualTo(5);
-    assertThat(result.articleList()).isEmpty();
-    assertThat(result.currentPage()).isEqualTo(2);
-  }
+        assertThat(result.totalArticles()).isEqualTo(5);
+        assertThat(result.articleList()).isEmpty();
+        assertThat(result.currentPage()).isEqualTo(2);
+    }
 
-  @Test
-  void searchArticleOverview_pageOneJava_returnsFirstPageThreeArticles() {
-    var result = articleService.searchArticleOverview(1, null, List.of("Java"));
+    @Test
+    void searchArticleOverview_pageOneJava_returnsFirstPageThreeArticles() {
+        var result = articleService.searchArticleOverview(1, null, List.of("Java"));
 
-    assertThat(result.totalArticles()).isEqualTo(3);
-    assertThat(result.articleList()).hasSize(3);
-  }
+        assertThat(result.totalArticles()).isEqualTo(3);
+        assertThat(result.articleList()).hasSize(3);
+    }
 
-  @Test
-  void searchArticleOverview_pageOneJavaWrongCase_returnsFirstPageThreeArticles() {
-    var result = articleService.searchArticleOverview(1, null, List.of("jAVa"));
+    @Test
+    void searchArticleOverview_pageOneJavaWrongCase_returnsFirstPageThreeArticles() {
+        var result = articleService.searchArticleOverview(1, null, List.of("jAVa"));
 
-    assertThat(result.totalArticles()).isEqualTo(3);
-    assertThat(result.articleList()).hasSize(3);
-  }
+        assertThat(result.totalArticles()).isEqualTo(3);
+        assertThat(result.articleList()).hasSize(3);
+    }
 
-  @Test
-  void searchArticleOverview_twoTagsJavaAndPerformance_returnsOneArticle() {
-    var result = articleService.searchArticleOverview(1, null, List.of("Java", "Performance"));
+    @Test
+    void searchArticleOverview_twoTagsJavaAndPerformance_returnsOneArticle() {
+        var result = articleService.searchArticleOverview(1, null, List.of("Java", "Performance"));
 
-    assertThat(result.totalArticles()).isEqualTo(1);
-    assertThat(result.articleList()).hasSize(1);
-  }
+        assertThat(result.totalArticles()).isEqualTo(1);
+        assertThat(result.articleList()).hasSize(1);
+    }
 
-  @Test
-  void searchArticleOverview_twoTagsJavaAndNixOS_returnsOneArticle() {
-    var result = articleService.searchArticleOverview(1, null, List.of("Java", "NixOS"));
+    @Test
+    void searchArticleOverview_twoTagsJavaAndNixOS_returnsOneArticle() {
+        var result = articleService.searchArticleOverview(1, null, List.of("Java", "NixOS"));
 
-    assertThat(result.totalArticles()).isEqualTo(1);
-    assertThat(result.articleList()).hasSize(1);
-  }
+        assertThat(result.totalArticles()).isEqualTo(1);
+        assertThat(result.articleList()).hasSize(1);
+    }
 
-  @Test
-  void searchArticleOverview_twoTagsWrongCase_returnsOneArticle() {
-    var result = articleService.searchArticleOverview(1, null, List.of("jAvA", "pErFoRmAnCe"));
+    @Test
+    void searchArticleOverview_twoTagsWrongCase_returnsOneArticle() {
+        var result = articleService.searchArticleOverview(1, null, List.of("jAvA", "pErFoRmAnCe"));
 
-    assertThat(result.totalArticles()).isEqualTo(1);
-    assertThat(result.articleList()).hasSize(1);
-  }
+        assertThat(result.totalArticles()).isEqualTo(1);
+        assertThat(result.articleList()).hasSize(1);
+    }
 
-  @Test
-  void searchArticleOverview_duplicateTags_treatedAsSingleTag() {
-    var result = articleService.searchArticleOverview(1, null, List.of("Java", "Java"));
+    @Test
+    void searchArticleOverview_duplicateTags_treatedAsSingleTag() {
+        var result = articleService.searchArticleOverview(1, null, List.of("Java", "Java"));
 
-    assertThat(result.totalArticles()).isEqualTo(3);
-    assertThat(result.articleList()).hasSize(3);
-  }
+        assertThat(result.totalArticles()).isEqualTo(3);
+        assertThat(result.articleList()).hasSize(3);
+    }
 
-  @Test
-  void searchArticleOverview_emptyTagList_returnsAllArticles() {
-    var result = articleService.searchArticleOverview(1, null, List.of());
+    @Test
+    void searchArticleOverview_emptyTagList_returnsAllArticles() {
+        var result = articleService.searchArticleOverview(1, null, List.of());
 
-    assertThat(result.totalArticles()).isEqualTo(5);
-    assertThat(result.articleList()).hasSize(5);
-  }
+        assertThat(result.totalArticles()).isEqualTo(5);
+        assertThat(result.articleList()).hasSize(5);
+    }
 
-  @Test
-  void searchArticleOverview_tagWithBlankStrings_ignoredReturnsAllArticles() {
-    var result = articleService.searchArticleOverview(1, null, List.of("", "  "));
+    @Test
+    void searchArticleOverview_tagWithBlankStrings_ignoredReturnsAllArticles() {
+        var result = articleService.searchArticleOverview(1, null, List.of("", "  "));
 
-    assertThat(result.totalArticles()).isEqualTo(5);
-    assertThat(result.articleList()).hasSize(5);
-  }
+        assertThat(result.totalArticles()).isEqualTo(5);
+        assertThat(result.articleList()).hasSize(5);
+    }
 
-  @Test
-  void searchArticleOverview_nonexistentTag_returnsEmptyList() {
-    var result = articleService.searchArticleOverview(1, null, List.of("NonexistentTag"));
+    @Test
+    void searchArticleOverview_nonexistentTag_returnsEmptyList() {
+        var result = articleService.searchArticleOverview(1, null, List.of("NonexistentTag"));
 
-    assertThat(result.totalArticles()).isZero();
-    assertThat(result.articleList()).isEmpty();
-  }
+        assertThat(result.totalArticles()).isZero();
+        assertThat(result.articleList()).isEmpty();
+    }
 
-  @Test
-  void searchArticleOverview_textAndTwoTags_returnsMatchingArticle() {
-    var result = articleService.searchArticleOverview(1, "Java 21", List.of("Java", "Performance"));
+    @Test
+    void searchArticleOverview_textAndTwoTags_returnsMatchingArticle() {
+        var result =
+                articleService.searchArticleOverview(1, "Java 21", List.of("Java", "Performance"));
 
-    assertThat(result.totalArticles()).isEqualTo(1);
-    assertThat(result.articleList()).hasSize(1);
-  }
+        assertThat(result.totalArticles()).isEqualTo(1);
+        assertThat(result.articleList()).hasSize(1);
+    }
 
-  @Test
-  void searchArticleOverview_textWithPercentSign_returnsNoArticles() {
-    var result = articleService.searchArticleOverview(1, "%", null);
+    @Test
+    void searchArticleOverview_textWithPercentSign_returnsNoArticles() {
+        var result = articleService.searchArticleOverview(1, "%", null);
 
-    assertThat(result.totalArticles()).isZero();
-    assertThat(result.articleList()).isEmpty();
-  }
+        assertThat(result.totalArticles()).isZero();
+        assertThat(result.articleList()).isEmpty();
+    }
 
-  @Test
-  void searchArticleOverview_textWithUnderscore_returnsNoArticles() {
-    var result = articleService.searchArticleOverview(1, "_", null);
+    @Test
+    void searchArticleOverview_textWithUnderscore_returnsNoArticles() {
+        var result = articleService.searchArticleOverview(1, "_", null);
 
-    assertThat(result.totalArticles()).isZero();
-    assertThat(result.articleList()).isEmpty();
-  }
+        assertThat(result.totalArticles()).isZero();
+        assertThat(result.articleList()).isEmpty();
+    }
 
-  @Test
-  @TestTransaction
-  void searchArticleOverview_textWithPercentSign_returnsOnlyLiteralMatches() {
-    String title = "Weekend test article: 100%";
-    persistTestArticle(title);
+    @Test
+    @TestTransaction
+    void searchArticleOverview_textWithPercentSign_returnsOnlyLiteralMatches() {
+        String title = "Weekend test article: 100%";
+        persistTestArticle(title);
 
-    var result = articleService.searchArticleOverview(1, "100%", null);
+        var result = articleService.searchArticleOverview(1, "100%", null);
 
-    assertThat(result.totalArticles()).isEqualTo(1);
-    assertThat(result.articleList()).hasSize(1);
-    assertThat(result.articleList().get(0).title()).isEqualTo(title);
-  }
+        assertThat(result.totalArticles()).isEqualTo(1);
+        assertThat(result.articleList()).hasSize(1);
+        assertThat(result.articleList().get(0).title()).isEqualTo(title);
+    }
 
-  private Article persistTestArticle(String title) {
-    Article article = new Article();
-    article.title = title;
-    article.logoUrl = "https://example.com/logos/sale.png";
-    article.summary = "My test article";
-    article.textContent = "My test article";
-    article.persist();
-    return article;
-  }
+    private Article persistTestArticle(String title) {
+        Article article = new Article();
+        article.title = title;
+        article.logoUrl = "https://example.com/logos/sale.png";
+        article.summary = "My test article";
+        article.textContent = "My test article";
+        article.persist();
+        return article;
+    }
 
-  @Test
-  void deleteArticleByTitle_nonExistentTitle_nothingChanged() {
-    var firstSelect = articleService.searchArticleOverview(null, null, null);
-    articleService.deleteArticleByTitle("dsdfjsdfsdfj");
-    var secondSelect = articleService.searchArticleOverview(null, null, null);
+    @Test
+    void deleteArticleByTitle_nonExistentTitle_nothingChanged() {
+        var firstSelect = articleService.searchArticleOverview(null, null, null);
+        articleService.deleteArticleByTitle("dsdfjsdfsdfj");
+        var secondSelect = articleService.searchArticleOverview(null, null, null);
 
-    assertThat(secondSelect.totalArticles()).isEqualTo(firstSelect.totalArticles());
-  }
+        assertThat(secondSelect.totalArticles()).isEqualTo(firstSelect.totalArticles());
+    }
 
-  @Test
-  @TestTransaction
-  void deleteArticleByTitle_existingTitle_minusOneArticle() {
-    persistTestArticle("Weekend test article: 100%");
-    var firstSelect = articleService.searchArticleOverview(null, null, null);
-    var expected = firstSelect.totalArticles() - 1;
-    articleService.deleteArticleByTitle("Weekend test article: 100%");
-    var secondSelect = articleService.searchArticleOverview(null, null, null);
+    @Test
+    @TestTransaction
+    void deleteArticleByTitle_existingTitle_minusOneArticle() {
+        persistTestArticle("Weekend test article: 100%");
+        var firstSelect = articleService.searchArticleOverview(null, null, null);
+        var expected = firstSelect.totalArticles() - 1;
+        articleService.deleteArticleByTitle("Weekend test article: 100%");
+        var secondSelect = articleService.searchArticleOverview(null, null, null);
 
-    assertThat(secondSelect.totalArticles()).isEqualTo(expected);
-  }
+        assertThat(secondSelect.totalArticles()).isEqualTo(expected);
+    }
 
-  @Test
-  @TestTransaction
-  void editArticle_existingTitle_updateArticle() {
-    var title = "Weekend test article: 100%";
-    var newSummary = "Another Summary";
-    var article = persistTestArticle(title);
-    var articleDto = new ArticleDto(article.title,
-        article.logoUrl,
-        newSummary,
-        article.textContent,
-        article.createdAt,
-        article.updatedAt,
-        new HashSet<SourceDto>(),
-        new HashSet<TagDto>());
-    var result = articleService.editArticle(articleDto, title);
-    assertThat(newSummary).isEqualTo(result.summary());
-  }
+    @Test
+    @TestTransaction
+    void editArticle_existingTitle_updateArticle() {
+        var title = "Weekend test article: 100%";
+        var newSummary = "Another Summary";
+        var article = persistTestArticle(title);
+        var articleDto =
+                new ArticleDto(
+                        article.title,
+                        article.logoUrl,
+                        newSummary,
+                        article.textContent,
+                        article.createdAt,
+                        article.updatedAt,
+                        new HashSet<SourceDto>(),
+                        new HashSet<TagDto>());
+        var result = articleService.editArticle(articleDto, title);
+        assertThat(newSummary).isEqualTo(result.summary());
+    }
 
-  @Test
-  @TestTransaction
-  void editArticle_notExistingTitle_notFoundException() {
-    var title = "Weekend test article: 100%";
-    var articleDto = new ArticleDto(title,
-        "url",
-        "Another Summary",
-        "text",
-        LocalDateTime.now(),
-        LocalDateTime.now(),
-        new HashSet<SourceDto>(),
-        new HashSet<TagDto>());
+    @Test
+    @TestTransaction
+    void editArticle_notExistingTitle_notFoundException() {
+        var title = "Weekend test article: 100%";
+        var articleDto =
+                new ArticleDto(
+                        title,
+                        "url",
+                        "Another Summary",
+                        "text",
+                        LocalDateTime.now(),
+                        LocalDateTime.now(),
+                        new HashSet<SourceDto>(),
+                        new HashSet<TagDto>());
 
-    assertThatThrownBy(() -> articleService.editArticle(articleDto, title)).isInstanceOf(NotFoundException.class);
-  }
+        assertThatThrownBy(() -> articleService.editArticle(articleDto, title))
+                .isInstanceOf(NotFoundException.class);
+    }
 
-  @Test
-  @TestTransaction
-  void editArticle_duplicateTagNamesDifferentCase_persistsSingleTag() {
-    var title = "Tag dedupe test article";
-    var article = persistTestArticle(title);
-    Set<TagDto> tags = new HashSet<>(List.of(new TagDto("Neu"), new TagDto("neu"), new TagDto("NEU")));
-    var articleDto = new ArticleDto(article.title, article.logoUrl, article.summary, article.textContent,
-        article.createdAt, article.updatedAt, new HashSet<SourceDto>(), tags);
+    @Test
+    @TestTransaction
+    void editArticle_duplicateTagNamesDifferentCase_persistsSingleTag() {
+        var title = "Tag dedupe test article";
+        var article = persistTestArticle(title);
+        Set<TagDto> tags =
+                new HashSet<>(List.of(new TagDto("Neu"), new TagDto("neu"), new TagDto("NEU")));
+        var articleDto =
+                new ArticleDto(
+                        article.title,
+                        article.logoUrl,
+                        article.summary,
+                        article.textContent,
+                        article.createdAt,
+                        article.updatedAt,
+                        new HashSet<SourceDto>(),
+                        tags);
 
-    var result = articleService.editArticle(articleDto, title);
+        var result = articleService.editArticle(articleDto, title);
 
-    assertThat(result.tags()).hasSize(1);
-    assertThat(result.tags().iterator().next().name()).isEqualToIgnoringCase("neu");
-    assertThat(Tag.count("lower(name) = lower(?1)", "neu")).isEqualTo(1);
-  }
+        assertThat(result.tags()).hasSize(1);
+        assertThat(result.tags().iterator().next().name()).isEqualToIgnoringCase("neu");
+        assertThat(Tag.count("lower(name) = lower(?1)", "neu")).isEqualTo(1);
+    }
 
-  @Test
-  @TestTransaction
-  void editArticle_newSourceUrl_addsAndPersistsNewSource() {
-    var title = "Source add test article";
-    var article = persistTestArticle(title);
-    var oldSource = new Source();
-    oldSource.article = article;
-    oldSource.title = "Old source";
-    oldSource.url = "https://example.com/old";
-    oldSource.citation = "old citation";
-    article.sources.add(oldSource);
-    var newSourceDto = new SourceDto("New source", "https://example.com/new", "new citation");
-    var articleDto = new ArticleDto(article.title, article.logoUrl, article.summary, article.textContent,
-        article.createdAt, article.updatedAt,
-        new HashSet<>(Set.of(new SourceDto("Old source", "https://example.com/old", "old citation"), newSourceDto)),
-        new HashSet<TagDto>());
+    @Test
+    @TestTransaction
+    void editArticle_newSourceUrl_addsAndPersistsNewSource() {
+        var title = "Source add test article";
+        var article = persistTestArticle(title);
+        var oldSource = new Source();
+        oldSource.article = article;
+        oldSource.title = "Old source";
+        oldSource.url = "https://example.com/old";
+        oldSource.citation = "old citation";
+        article.sources.add(oldSource);
+        var newSourceDto = new SourceDto("New source", "https://example.com/new", "new citation");
+        var articleDto =
+                new ArticleDto(
+                        article.title,
+                        article.logoUrl,
+                        article.summary,
+                        article.textContent,
+                        article.createdAt,
+                        article.updatedAt,
+                        new HashSet<>(
+                                Set.of(
+                                        new SourceDto(
+                                                "Old source",
+                                                "https://example.com/old",
+                                                "old citation"),
+                                        newSourceDto)),
+                        new HashSet<TagDto>());
 
-    var result = articleService.editArticle(articleDto, title);
+        var result = articleService.editArticle(articleDto, title);
 
-    assertThat(result.sources()).hasSize(2);
-    assertThat(result.sources().stream().map(SourceDto::url).toList())
-        .containsExactlyInAnyOrder("https://example.com/old", "https://example.com/new");
-    assertThat(Source.count("url = ?1", "https://example.com/new")).isEqualTo(1);
-    assertThat(Source.count("url = ?1", "https://example.com/old")).isEqualTo(1);
-  }
-
+        assertThat(result.sources()).hasSize(2);
+        assertThat(result.sources().stream().map(SourceDto::url).toList())
+                .containsExactlyInAnyOrder("https://example.com/old", "https://example.com/new");
+        assertThat(Source.count("url = ?1", "https://example.com/new")).isEqualTo(1);
+        assertThat(Source.count("url = ?1", "https://example.com/old")).isEqualTo(1);
+    }
 }

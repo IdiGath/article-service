@@ -12,4 +12,4 @@ import java.util.Set;
  * clients. All temporal fields use the server's local time zone.
  */
 public record ArticlePreviewDto(
-    String title, String logoUrl, String summary, LocalDateTime createdAt, Set<TagDto> tags) {}
+        String title, String logoUrl, String summary, LocalDateTime createdAt, Set<TagDto> tags) {}

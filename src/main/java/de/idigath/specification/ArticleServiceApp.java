@@ -11,14 +11,15 @@ import org.eclipse.microprofile.openapi.annotations.info.License;
  * because of this this manual created class is settet under service specification package.
  */
 @OpenAPIDefinition(
-    info =
-        @Info(
-            title = "Article Service API",
-            version = "1.0.0",
-            contact =
-                @Contact(
-                    name = "API support",
-                    url = "http://idiblog.com/contact",
-                    email = "i.izrailtenko@mailbox.org"),
-            license = @License(name = "MIT", url = "https://opensource.org/license/MIT")))
+        info =
+                @Info(
+                        title = "Article Service API",
+                        version = "1.0.0",
+                        contact =
+                                @Contact(
+                                        name = "API support",
+                                        url = "http://idiblog.com/contact",
+                                        email = "i.izrailtenko@mailbox.org"),
+                        license =
+                                @License(name = "MIT", url = "https://opensource.org/license/MIT")))
 public class ArticleServiceApp extends Application {}

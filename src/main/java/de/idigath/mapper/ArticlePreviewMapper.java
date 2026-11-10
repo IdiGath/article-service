@@ -16,13 +16,13 @@ import org.mapstruct.factory.Mappers;
 @Mapper
 public interface ArticlePreviewMapper {
 
-  ArticlePreviewMapper INSTANCE = Mappers.getMapper(ArticlePreviewMapper.class);
+    ArticlePreviewMapper INSTANCE = Mappers.getMapper(ArticlePreviewMapper.class);
 
-  /**
-   * Converts an Article entity to its Preview DTO representation for safe API exposure.
-   *
-   * <p>This prevents serialization issues with Hibernate proxies and lazy-loaded collections, while
-   * ensuring the API contract remains stable regardless of entity changes.
-   */
-  ArticlePreviewDto articleToArticlePreviewDto(Article article);
+    /**
+     * Converts an Article entity to its Preview DTO representation for safe API exposure.
+     *
+     * <p>This prevents serialization issues with Hibernate proxies and lazy-loaded collections,
+     * while ensuring the API contract remains stable regardless of entity changes.
+     */
+    ArticlePreviewDto articleToArticlePreviewDto(Article article);
 }

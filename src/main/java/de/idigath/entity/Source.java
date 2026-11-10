@@ -21,23 +21,23 @@ import jakarta.persistence.Table;
 @Table(name = "sources")
 public class Source extends PanacheEntity {
 
-  /**
-   * The article this source belongs to. Defines the {@link ManyToOne} relationship. Cascades
-   * deletion: if the article is deleted, all its sources are removed automatically.
-   */
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "article_id", nullable = false)
-  public Article article;
+    /**
+     * The article this source belongs to. Defines the {@link ManyToOne} relationship. Cascades
+     * deletion: if the article is deleted, all its sources are removed automatically.
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "article_id", nullable = false)
+    public Article article;
 
-  /** Source title to desplay at the sources list in the end of the article. */
-  @Column(length = 255, nullable = false)
-  public String title;
+    /** Source title to desplay at the sources list in the end of the article. */
+    @Column(length = 255, nullable = false)
+    public String title;
 
-  /** Url to the online Source. */
-  @Column(length = 255, nullable = false)
-  public String url;
+    /** Url to the online Source. */
+    @Column(length = 255, nullable = false)
+    public String url;
 
-  /** Citation information like chapter or line. */
-  @Column(nullable = false, columnDefinition = "TEXT")
-  public String citation;
+    /** Citation information like chapter or line. */
+    @Column(nullable = false, columnDefinition = "TEXT")
+    public String citation;
 }
