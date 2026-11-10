@@ -34,11 +34,15 @@ public interface ArticleMapper {
   ArticleDto articleToArticleDto(Article article);
 
   /**
-   * Converts Article DTO to its entity for persistence.
+   * Converts an Article DTO to its entity for persistence.
    *
    * <p>
-   * ignored attributes can be mapped only in DB context.
+   * {@code id}, {@code createdAt} and {@code updatedAt} are ignored: they are
+   * server-managed ({@code @CreationTimestamp}/{@code @UpdateTimestamp}) and must never be
+   * taken from client input.
    */
   @Mapping(target = "id", ignore = true)
+  @Mapping(target = "createdAt", ignore = true)
+  @Mapping(target = "updatedAt", ignore = true)
   Article articleDtoToArticle(ArticleDto articleDto);
 }
