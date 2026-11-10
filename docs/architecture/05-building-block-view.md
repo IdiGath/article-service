@@ -10,7 +10,7 @@ article-service
 ├── entity          Article, Source, Tag      — Panache entities (JPA)
 ├── model           ArticleDto, ArticlePreviewDto, ArticleOverview, SourceDto, TagDto
 ├── mapper          ArticleMapper, ArticlePreviewMapper, SourceMapper, TagMapper (MapStruct)
-└── exception       SqlTimeoutExceptionMapper, LongParamConverter(+Provider)
+└── exception       QueryTimeoutExceptionMapper, ConstraintViolationExceptionMapper
 ```
 
 External systems: **PostgreSQL** (JDBC via Hibernate), schema via Liquibase (`db/changeLog.xml`).
@@ -22,7 +22,7 @@ External systems: **PostgreSQL** (JDBC via Hibernate), schema via Liquibase (`db
 | GET | `/api/articles/{title}` | article by title → `ArticleDto` | implemented, tested |
 | GET | `/api/articles/search?page=&text=&tags=` | search + pagination → `ArticleOverview` | implemented, tested |
 | POST | `/api/articles` | create article | stub |
-| PUT | `/api/articles/{id}` | update article | stub |
+| PUT | `/api/articles/{title}` | update article (case-insensitive exact title) | implemented, tested |
 | DELETE | `/api/articles/{title}` | delete by exact title (case-insensitive) | implemented, tested |
 
 ## 5.3 Interfaces
