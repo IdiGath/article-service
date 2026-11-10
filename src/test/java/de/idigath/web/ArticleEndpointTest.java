@@ -59,7 +59,8 @@ public class ArticleEndpointTest {
         .then()
         .statusCode(200)
         .body("totalArticles", equalTo(5))
-        .body("articleList.size()", equalTo(5));
+        .body("articleList.size()", equalTo(5))
+        .body("currentPage", equalTo(1));
   }
 
   @Test
@@ -69,7 +70,8 @@ public class ArticleEndpointTest {
         .then()
         .statusCode(200)
         .body("totalArticles", equalTo(5))
-        .body("articleList.size()", equalTo(5));
+        .body("articleList.size()", equalTo(5))
+        .body("currentPage", equalTo(1));
   }
 
   @Test
@@ -79,7 +81,8 @@ public class ArticleEndpointTest {
         .then()
         .statusCode(200)
         .body("totalArticles", equalTo(5))
-        .body("articleList.size()", equalTo(0));
+        .body("articleList.size()", equalTo(0))
+        .body("currentPage", equalTo(2));
   }
 
   @Test

@@ -85,12 +85,13 @@ public class ArticleService {
    * response by the
    * exception mapper.
    *
-   * @param page the current page number in the query
+   * @param page 1-based page number; null or non-positive returns the first page
    * @param text text to search for in the headline (case-insensitive substring
    *             match; LIKE
    *             wildcards {@code %} and {@code _} are treated literally)
    * @param tags list of tags the article must have (case-insensitive)
-   * @return the overview with matching article previews, total count and page info;
+   * @return the overview with matching article previews, total count and page info
+   *         ({@code currentPage} is 1-based, matching the request parameter);
    *         the preview list is empty when nothing matches
    * @throws PersistenceException if a database error occurs (including timeout)
    */
@@ -109,7 +110,7 @@ public class ArticleService {
     for (Article article : articleList) {
       articlePreviewList.add(ArticlePreviewMapper.INSTANCE.articleToArticlePreviewDto(article));
     }
-    var result = new ArticleOverview(articlePreviewList, articleQuery.count(), searchPage, articleQuery.pageCount());
+    var result = new ArticleOverview(articlePreviewList, articleQuery.count(), searchPage + 1, articleQuery.pageCount());
     return result;
   }
 

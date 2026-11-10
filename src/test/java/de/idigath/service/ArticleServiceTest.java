@@ -51,6 +51,7 @@ public class ArticleServiceTest {
 
     assertThat(result.totalArticles()).isEqualTo(5);
     assertThat(result.articleList()).hasSize(5);
+    assertThat(result.currentPage()).isEqualTo(1);
   }
 
   @Test
@@ -59,6 +60,7 @@ public class ArticleServiceTest {
 
     assertThat(result.totalArticles()).isEqualTo(5);
     assertThat(result.articleList()).hasSize(5);
+    assertThat(result.currentPage()).isEqualTo(1);
   }
 
   @Test
@@ -67,6 +69,7 @@ public class ArticleServiceTest {
 
     assertThat(result.totalArticles()).isEqualTo(5);
     assertThat(result.articleList()).hasSize(5);
+    assertThat(result.currentPage()).isEqualTo(1);
   }
 
   @Test
@@ -75,6 +78,7 @@ public class ArticleServiceTest {
 
     assertThat(result.totalArticles()).isEqualTo(5);
     assertThat(result.articleList()).isEmpty();
+    assertThat(result.currentPage()).isEqualTo(2);
   }
 
   @Test
