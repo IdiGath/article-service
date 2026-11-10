@@ -38,6 +38,6 @@ public class Source extends PanacheEntity {
   public String url;
 
   /** Citation information like chapter or line. */
-  @Column(nullable = false, columnDefinition = "TEST")
+  @Column(nullable = false, columnDefinition = "TEXT")
   public String citation;
 }
