@@ -15,7 +15,6 @@ import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.transaction.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -94,12 +93,12 @@ public class Article extends PanacheEntity {
 
   /**
    * Deletes the article with the given title (case-insensitive exact match).
-   * Runs in its own transaction.
+   * Requires an active transaction; the transaction boundary is owned by the
+   * service layer.
    *
    * @param title exact article title, matched case-insensitively
    * @return 1 if an article was deleted, 0 if no article matches
    */
-  @Transactional
   public static long deleteByTitle(String title) {
     return delete("lower(title) = lower(?1)", title);
   }
