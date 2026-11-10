@@ -2,7 +2,7 @@
 
 This project provides a backend service for managing blog articles.
 
-**Status:** Work in progress. GET article by title, search with pagination, and DELETE by title are implemented and tested. Create (POST) and update (PUT) are stubs returning hardcoded responses. Not production-ready.
+**Status:** Work in progress. GET article by title, search with pagination, update (PUT) and DELETE by title are implemented and tested. Create (POST) is still a stub returning a hardcoded response. Not production-ready.
 
 ## Architecture
 The project consists of:
@@ -16,11 +16,13 @@ The architecture is documented following the arc42 template in [docs/architectur
 - **Article search** by title and tags (case-insensitive, supports multiple tags with AND logic)
 - **Pagination** for article lists
 - **Article deletion** by exact title match (case-insensitive)
+- **Article update** by exact title match (case-insensitive)
 - **REST API** for content access
-- TODO **Create and update operations** (create, update articles)
+- TODO **Create operation** (POST /api/articles is still a stub)
 - TODO **AI-powered article classification and spell-checking** (on article creation via POST: auto-suggest tags/categories from content, check spelling without altering writing style)
 - TODO **Markdown-to-HTML parsing** (converts stored Markdown to HTML before returning it to the client)
 - TODO **Container image build** (wire up the generated Dockerfiles in `src/main/docker/` with make targets and documentation)
+- TODO **ArchUnit** (add `archunit-junit5` in test scope to `pom.xml` and write the first architecture test: layer/package dependency rules)
 
 ## Workflow
 1. Articles are stored in the database as **Markdown**.
