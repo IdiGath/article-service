@@ -9,11 +9,14 @@ import de.idigath.entity.Tag;
 import de.idigath.model.ArticleDto;
 import de.idigath.model.SourceDto;
 import de.idigath.model.TagDto;
+import io.quarkus.narayana.jta.QuarkusTransaction;
 import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.NotFoundException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,102 +47,114 @@ public class ArticleServiceTest {
 
     @Test
     void searchArticleOverview_nullParameters_returnsFirstPage() {
+        var all = seedArticleCount();
         var result = articleService.searchArticleOverview(null, null, null);
 
-        assertThat(result.totalArticles()).isEqualTo(5);
-        assertThat(result.articleList()).hasSize(5);
+        assertThat(result.totalArticles()).isEqualTo(all);
+        assertThat(result.articleList()).hasSize((int) all);
         assertThat(result.currentPage()).isEqualTo(1);
     }
 
     @Test
     void searchArticleOverview_negativePage_returnsFirstPage() {
+        var all = seedArticleCount();
         var result = articleService.searchArticleOverview(-1, null, null);
 
-        assertThat(result.totalArticles()).isEqualTo(5);
-        assertThat(result.articleList()).hasSize(5);
+        assertThat(result.totalArticles()).isEqualTo(all);
+        assertThat(result.articleList()).hasSize((int) all);
         assertThat(result.currentPage()).isEqualTo(1);
     }
 
     @Test
     void searchArticleOverview_pageOne_returnsFirstPage() {
+        var all = seedArticleCount();
         var result = articleService.searchArticleOverview(1, null, null);
 
-        assertThat(result.totalArticles()).isEqualTo(5);
-        assertThat(result.articleList()).hasSize(5);
+        assertThat(result.totalArticles()).isEqualTo(all);
+        assertThat(result.articleList()).hasSize((int) all);
         assertThat(result.currentPage()).isEqualTo(1);
     }
 
     @Test
     void searchArticleOverview_pageTwo_returnsEmptyList() {
+        var all = seedArticleCount();
         var result = articleService.searchArticleOverview(2, null, null);
 
-        assertThat(result.totalArticles()).isEqualTo(5);
+        assertThat(result.totalArticles()).isEqualTo(all);
         assertThat(result.articleList()).isEmpty();
         assertThat(result.currentPage()).isEqualTo(2);
     }
 
     @Test
-    void searchArticleOverview_pageOneJava_returnsFirstPageThreeArticles() {
+    void searchArticleOverview_pageOneJava_returnsAllJavaTaggedArticles() {
+        var javaTagged = seedArticleCountWithAllTags("Java");
         var result = articleService.searchArticleOverview(1, null, List.of("Java"));
 
-        assertThat(result.totalArticles()).isEqualTo(3);
-        assertThat(result.articleList()).hasSize(3);
+        assertThat(result.totalArticles()).isEqualTo(javaTagged);
+        assertThat(result.articleList()).hasSize((int) javaTagged);
     }
 
     @Test
-    void searchArticleOverview_pageOneJavaWrongCase_returnsFirstPageThreeArticles() {
+    void searchArticleOverview_pageOneJavaWrongCase_returnsAllJavaTaggedArticles() {
+        var javaTagged = seedArticleCountWithAllTags("jAVa");
         var result = articleService.searchArticleOverview(1, null, List.of("jAVa"));
 
-        assertThat(result.totalArticles()).isEqualTo(3);
-        assertThat(result.articleList()).hasSize(3);
+        assertThat(result.totalArticles()).isEqualTo(javaTagged);
+        assertThat(result.articleList()).hasSize((int) javaTagged);
     }
 
     @Test
-    void searchArticleOverview_twoTagsJavaAndPerformance_returnsOneArticle() {
+    void searchArticleOverview_twoTagsJavaAndPerformance_returnsMatchingArticles() {
+        var bothTagged = seedArticleCountWithAllTags("Java", "Performance");
         var result = articleService.searchArticleOverview(1, null, List.of("Java", "Performance"));
 
-        assertThat(result.totalArticles()).isEqualTo(1);
-        assertThat(result.articleList()).hasSize(1);
+        assertThat(result.totalArticles()).isEqualTo(bothTagged);
+        assertThat(result.articleList()).hasSize((int) bothTagged);
     }
 
     @Test
-    void searchArticleOverview_twoTagsJavaAndNixOS_returnsOneArticle() {
+    void searchArticleOverview_twoTagsJavaAndNixOS_returnsMatchingArticles() {
+        var bothTagged = seedArticleCountWithAllTags("Java", "NixOS");
         var result = articleService.searchArticleOverview(1, null, List.of("Java", "NixOS"));
 
-        assertThat(result.totalArticles()).isEqualTo(1);
-        assertThat(result.articleList()).hasSize(1);
+        assertThat(result.totalArticles()).isEqualTo(bothTagged);
+        assertThat(result.articleList()).hasSize((int) bothTagged);
     }
 
     @Test
-    void searchArticleOverview_twoTagsWrongCase_returnsOneArticle() {
+    void searchArticleOverview_twoTagsWrongCase_returnsMatchingArticles() {
+        var bothTagged = seedArticleCountWithAllTags("jAvA", "pErFoRmAnCe");
         var result = articleService.searchArticleOverview(1, null, List.of("jAvA", "pErFoRmAnCe"));
 
-        assertThat(result.totalArticles()).isEqualTo(1);
-        assertThat(result.articleList()).hasSize(1);
+        assertThat(result.totalArticles()).isEqualTo(bothTagged);
+        assertThat(result.articleList()).hasSize((int) bothTagged);
     }
 
     @Test
     void searchArticleOverview_duplicateTags_treatedAsSingleTag() {
+        var javaTagged = seedArticleCountWithAllTags("Java", "Java");
         var result = articleService.searchArticleOverview(1, null, List.of("Java", "Java"));
 
-        assertThat(result.totalArticles()).isEqualTo(3);
-        assertThat(result.articleList()).hasSize(3);
+        assertThat(result.totalArticles()).isEqualTo(javaTagged);
+        assertThat(result.articleList()).hasSize((int) javaTagged);
     }
 
     @Test
     void searchArticleOverview_emptyTagList_returnsAllArticles() {
+        var all = seedArticleCount();
         var result = articleService.searchArticleOverview(1, null, List.of());
 
-        assertThat(result.totalArticles()).isEqualTo(5);
-        assertThat(result.articleList()).hasSize(5);
+        assertThat(result.totalArticles()).isEqualTo(all);
+        assertThat(result.articleList()).hasSize((int) all);
     }
 
     @Test
     void searchArticleOverview_tagWithBlankStrings_ignoredReturnsAllArticles() {
+        var all = seedArticleCount();
         var result = articleService.searchArticleOverview(1, null, List.of("", "  "));
 
-        assertThat(result.totalArticles()).isEqualTo(5);
-        assertThat(result.articleList()).hasSize(5);
+        assertThat(result.totalArticles()).isEqualTo(all);
+        assertThat(result.articleList()).hasSize((int) all);
     }
 
     @Test
@@ -151,12 +166,13 @@ public class ArticleServiceTest {
     }
 
     @Test
-    void searchArticleOverview_textAndTwoTags_returnsMatchingArticle() {
+    void searchArticleOverview_textAndTwoTags_returnsMatchingArticles() {
+        var expected = seedArticleCount("Java 21", List.of("Java", "Performance"));
         var result =
                 articleService.searchArticleOverview(1, "Java 21", List.of("Java", "Performance"));
 
-        assertThat(result.totalArticles()).isEqualTo(1);
-        assertThat(result.articleList()).hasSize(1);
+        assertThat(result.totalArticles()).isEqualTo(expected);
+        assertThat(result.articleList()).hasSize((int) expected);
     }
 
     @Test
@@ -186,6 +202,56 @@ public class ArticleServiceTest {
         assertThat(result.totalArticles()).isEqualTo(1);
         assertThat(result.articleList()).hasSize(1);
         assertThat(result.articleList().get(0).title()).isEqualTo(title);
+    }
+
+    /**
+     * Counts seed articles, mirroring {@link Article#findByTitleAndTags}: literal case-insensitive
+     * title substring (LIKE wildcards escaped), and the article must have ALL given tags
+     * (case-insensitive, blanks ignored, duplicates deduped).
+     */
+    private long seedArticleCount(String text, List<String> tags) {
+        String escaped =
+                (text == null ? "" : text).replace("!", "!!").replace("%", "!%").replace("_", "!_");
+        List<String> distinctTags =
+                tags == null
+                        ? List.of()
+                        : tags.stream()
+                                .filter(t -> t != null && !t.isBlank())
+                                .map(String::toLowerCase)
+                                .distinct()
+                                .toList();
+        return QuarkusTransaction.requiringNew()
+                .call(() -> {
+                    StringBuilder sql =
+                            new StringBuilder(
+                                    "SELECT count(*) FROM articles a WHERE lower(a.title) LIKE lower(?) ESCAPE '!'");
+                    List<Object> params = new ArrayList<>();
+                    params.add("%" + escaped + "%");
+                    if (!distinctTags.isEmpty()) {
+                        String placeholders =
+                                String.join(",", Collections.nCopies(distinctTags.size(), "?"));
+                        sql.append(
+                                        " AND a.id IN (SELECT at.article_id FROM article_tags at JOIN tags t ON t.id = at.tag_id WHERE lower(t.name) IN (")
+                                .append(placeholders)
+                                .append(") GROUP BY at.article_id HAVING count(DISTINCT t.id) = ")
+                                .append(distinctTags.size())
+                                .append(")");
+                        params.addAll(distinctTags);
+                    }
+                    var query = Article.getEntityManager().createNativeQuery(sql.toString());
+                    for (int i = 0; i < params.size(); i++) {
+                        query.setParameter(i + 1, params.get(i));
+                    }
+                    return ((Number) query.getSingleResult()).longValue();
+                });
+    }
+
+    private long seedArticleCount() {
+        return seedArticleCount(null, null);
+    }
+
+    private long seedArticleCountWithAllTags(String... tagNames) {
+        return seedArticleCount(null, List.of(tagNames));
     }
 
     private Article persistTestArticle(String title) {

@@ -13,6 +13,7 @@ import io.quarkus.narayana.jta.QuarkusTransaction;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import java.util.Collections;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -53,50 +54,60 @@ public class ArticleEndpointTest {
 
     @Test
     void searchArticle_noParameters_returnsAllArticles() {
+        int all = (int) seedArticleCount();
+
         when().get("/search")
                 .then()
                 .statusCode(200)
-                .body("totalArticles", equalTo(5))
-                .body("articleList.size()", equalTo(5))
+                .body("totalArticles", equalTo(all))
+                .body("articleList.size()", equalTo(all))
                 .body("currentPage", equalTo(1));
     }
 
     @Test
     void searchArticle_withPageParameter_returnsFirstPage() {
+        int all = (int) seedArticleCount();
+
         when().get("/search?page=1")
                 .then()
                 .statusCode(200)
-                .body("totalArticles", equalTo(5))
-                .body("articleList.size()", equalTo(5))
+                .body("totalArticles", equalTo(all))
+                .body("articleList.size()", equalTo(all))
                 .body("currentPage", equalTo(1));
     }
 
     @Test
-    void searchArticle_pageTwo_returnsEmptyListButTotalFive() {
+    void searchArticle_pageTwo_returnsEmptyListButTotalAll() {
+        int all = (int) seedArticleCount();
+
         when().get("/search?page=2")
                 .then()
                 .statusCode(200)
-                .body("totalArticles", equalTo(5))
+                .body("totalArticles", equalTo(all))
                 .body("articleList.size()", equalTo(0))
                 .body("currentPage", equalTo(2));
     }
 
     @Test
-    void searchArticle_singleTagJava_returnsThreeArticles() {
+    void searchArticle_singleTagJava_returnsAllJavaTaggedArticles() {
+        int javaTagged = (int) seedArticleCountWithAllTags("Java");
+
         when().get("/search?tag=Java")
                 .then()
                 .statusCode(200)
-                .body("totalArticles", equalTo(3))
-                .body("articleList.size()", equalTo(3));
+                .body("totalArticles", equalTo(javaTagged))
+                .body("articleList.size()", equalTo(javaTagged));
     }
 
     @Test
-    void searchArticle_twoTagsJavaAndPerformance_returnsOneMatchingArticle() {
+    void searchArticle_twoTagsJavaAndPerformance_returnsMatchingArticle() {
+        int bothTagged = (int) seedArticleCountWithAllTags("Java", "Performance");
+
         when().get("/search?page=1&tag=Java&tag=Performance")
                 .then()
                 .statusCode(200)
-                .body("totalArticles", equalTo(1))
-                .body("articleList.size()", equalTo(1))
+                .body("totalArticles", equalTo(bothTagged))
+                .body("articleList.size()", equalTo(bothTagged))
                 .body("articleList[0].title", equalTo("Java 21: New Features"));
     }
 
@@ -263,6 +274,43 @@ public class ArticleEndpointTest {
                             .executeUpdate();
 
                     when().get("/{title}", "NixOS for Java Developers").then().statusCode(504);
+                });
+    }
+
+    private long seedArticleCount() {
+        return QuarkusTransaction.requiringNew()
+                .call(() ->
+                        ((Number)
+                                        Article.getEntityManager()
+                                                .createNativeQuery("SELECT count(*) FROM articles")
+                                                .getSingleResult())
+                                .longValue());
+    }
+
+    /**
+     * Mirrors {@link Article#findByTitleAndTags} tag semantics: an article matches when it has ALL
+     * given tags (case-insensitive).
+     */
+    private long seedArticleCountWithAllTags(String... tagNames) {
+        String placeholders = String.join(",", Collections.nCopies(tagNames.length, "?"));
+        return QuarkusTransaction.requiringNew()
+                .call(() -> {
+                    var query =
+                            Article.getEntityManager()
+                                    .createNativeQuery(
+                                            "SELECT count(*) FROM (SELECT a.id FROM articles a"
+                                                    + " JOIN article_tags at ON at.article_id = a.id"
+                                                    + " JOIN tags t ON t.id = at.tag_id"
+                                                    + " WHERE lower(t.name) IN ("
+                                                    + placeholders
+                                                    + ")"
+                                                    + " GROUP BY a.id HAVING count(DISTINCT t.id) = "
+                                                    + tagNames.length
+                                                    + ") matched");
+                    for (int i = 0; i < tagNames.length; i++) {
+                        query.setParameter(i + 1, tagNames[i].toLowerCase());
+                    }
+                    return ((Number) query.getSingleResult()).longValue();
                 });
     }
 
