@@ -233,19 +233,16 @@ public class ArticleEndpointTest {
 
   @Test
   void getArticle_tableLockedByOtherTransaction_returns504() {
-    setStatementTimeout("SET statement_timeout = '1s'");
+    // statement_timeout=1s applies to every pooled connection via
+    // quarkus.datasource.jdbc.additional-jdbc-properties in src/test/resources/application.properties,
+    // so the request blocked on the lock times out as QueryTimeoutException -> 504.
+    QuarkusTransaction.requiringNew().run(() -> {
+      Article.getEntityManager()
+          .createNativeQuery("LOCK TABLE articles IN ACCESS EXCLUSIVE MODE")
+          .executeUpdate();
 
-    try {
-      QuarkusTransaction.requiringNew().run(() -> {
-        Article.getEntityManager()
-            .createNativeQuery("LOCK TABLE articles IN ACCESS EXCLUSIVE MODE")
-            .executeUpdate();
-
-        when().get("/{title}", "NixOS for Java Developers").then().statusCode(504);
-      });
-    } finally {
-      setStatementTimeout("RESET statement_timeout");
-    }
+      when().get("/{title}", "NixOS for Java Developers").then().statusCode(504);
+    });
   }
 
   private void persistTestArticle(String title) {
@@ -285,15 +282,6 @@ public class ArticleEndpointTest {
           "tags": []
         }
         """.formatted(title, summary, timestamp, timestamp);
-  }
-
-  private void setStatementTimeout(String alterClause) {
-    QuarkusTransaction.requiringNew().run(() -> {
-      var em = Article.getEntityManager();
-      var db = (String) em.createNativeQuery("SELECT current_database()").getSingleResult();
-      em.createNativeQuery("ALTER DATABASE \"" + db + "\" " + alterClause).executeUpdate();
-      em.createNativeQuery("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = current_database() AND pid <> pg_backend_pid()").getResultList();
-    });
   }
 
 }
