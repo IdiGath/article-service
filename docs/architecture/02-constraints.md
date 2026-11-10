@@ -8,7 +8,7 @@
 | Schema management | Liquibase, changelog `db/changeLog.xml`, migrates at startup; Hibernate validates schema (`database.generation=validate`) |
 | Build | Maven via the provided wrapper `./mvnw`; tasks exposed as `makefile` targets (`dev`, `build`, `test`, `generate-dev-sql`, `reset-db`) |
 | Secrets | Credentials only through env vars / `.env`; `.env` is in `.gitignore`, template in `.env.example` — never committed |
-| Timeouts | HTTP read/idle timeout 5s, JDBC timeout 5 (`application.properties`) |
+| Timeouts | HTTP read/idle timeout 30s (`application.properties`); JDBC statement timeout 5s in prod only (`statement_timeout=5000` in the %prod JDBC URL) |
 | License | MIT License, copyright Idigath |
 | Development process | AI-assisted development (Mistral Vibe) disclosed in the README; every change is human-directed and human-reviewed by Idigath |
 | Docs language | English for all project documentation; architecture documented in `docs/architecture/` (arc42) |

@@ -13,7 +13,7 @@ the first finished service of a personal blog platform.
 |---|---|---|
 | 1 | Developer experience | `make dev` starts the service with hot reload; DevServices auto-provisions PostgreSQL, no manual DB setup |
 | 2 | Testability | Unit + endpoint tests via `make test`; coverage report via `./mvnw clean verify` (JaCoCo) |
-| 3 | Operability | 5s HTTP read/idle timeouts and JDBC timeout configured; schema validated at startup (`database.generation=validate`) |
+| 3 | Operability | 30s HTTP read/idle timeouts configured; JDBC statement timeout 5s in prod (`statement_timeout` in the %prod JDBC URL); schema validated at startup (`database.generation=validate`) |
 | 4 | API transparency | OpenAPI spec + Swagger UI always available (`/q/openapi`, `/q/swagger-ui`) |
 
 ## 1.3 Stakeholders

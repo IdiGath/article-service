@@ -6,7 +6,7 @@
 |---|---|---|
 | Developer experience | Fast inner loop for a solo-maintained service | `make dev` → hot reload, DB auto-provisioned; no manual setup |
 | Testability | Changes reviewed safely | `make test` green; JaCoCo report at `target/site/jacoco/index.html` (numeric coverage target: not set yet) |
-| Operability | Fail fast on misconfiguration | Schema validated at boot (`database.generation=validate`); HTTP read/idle timeouts = 5s; JDBC statement timeout = 5s in prod only (`statement_timeout=5000` in the %prod JDBC URL) |
+| Operability | Fail fast on misconfiguration | Schema validated at boot (`database.generation=validate`); HTTP read/idle timeouts = 30s; JDBC statement timeout = 5s in prod only (`statement_timeout=5000` in the %prod JDBC URL) |
 | API transparency | Gateway integration without guesswork | OpenAPI at `/q/openapi`, Swagger UI always on |
 | Security | M2M calls only from trusted services | OAuth2 + mTLS per ADR-0002 — pending, currently none |
 
