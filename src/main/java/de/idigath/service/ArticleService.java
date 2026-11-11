@@ -25,11 +25,16 @@ import java.util.stream.Collectors;
 /**
  * Service layer for article-related business operations.
  *
- * <p>This class encapsulates the core business logic for article management, acting as an
- * intermediary between the REST controllers and the data access layer. It handles entity-to-DTO
+ * <p>
+ * This class encapsulates the core business logic for article management,
+ * acting as an
+ * intermediary between the REST controllers and the data access layer. It
+ * handles entity-to-DTO
  * mapping, exception translation, and coordinates database operations.
  *
- * <p>The service is stateless and application-scoped, making it suitable for concurrent request
+ * <p>
+ * The service is stateless and application-scoped, making it suitable for
+ * concurrent request
  * handling in a CDI environment.
  *
  * @see Article
@@ -42,58 +47,69 @@ public class ArticleService {
     /**
      * Retrieves the article with the given title (case-insensitive exact match).
      *
-     * <p>If no article exists with the specified title, a {@link NotFoundException} is thrown.
+     * <p>
+     * If no article exists with the specified title, a {@link NotFoundException} is
+     * thrown.
      *
-     * <p>Database query timeouts are propagated as {@link QueryTimeoutException}, which is later
+     * <p>
+     * Database query timeouts are propagated as {@link QueryTimeoutException},
+     * which is later
      * mapped to an HTTP 504 Gateway Timeout response by the exception mapper.
      *
      * @param title exact article title, matched case-insensitively
      * @return the article data transfer object containing all article fields
-     * @throws NotFoundException if no article exists with the given title
+     * @throws NotFoundException    if no article exists with the given title
      * @throws PersistenceException if a database error occurs (including timeout)
      */
     public ArticleDto findArticleByTitle(String title) {
-        var article =
-                Article.findByTitleOptional(title)
-                        .orElseThrow(() ->
-                                new NotFoundException(
-                                        "Article with title: " + title + " not found"));
+        var article = Article.findByTitleOptional(title)
+                .orElseThrow(() -> new NotFoundException(
+                        "Article with title: " + title + " not found"));
         ArticleDto result = ArticleMapper.INSTANCE.articleToArticleDto(article);
         return result;
     }
 
     /**
-     * Retrieves the article overview based on the current page, text in the headline and tags.
+     * Retrieves the article overview based on the current page, text in the
+     * headline and tags.
      *
-     * <p>If no article will be found a method returns an overview with empty or default values.
+     * <p>
+     * If no article will be found a method returns an overview with empty or
+     * default values.
      *
-     * <p>An article matches only if it has ALL of the given tags. Null or blank tags are ignored.
+     * <p>
+     * An article matches only if it has ALL of the given tags. Null or blank tags
+     * are ignored.
      * If the tag list is null or empty, the tag filter is not applied.
      *
-     * <p>Database query timeouts are propagated as {@link QueryTimeoutException}, which is later
+     * <p>
+     * Database query timeouts are propagated as {@link QueryTimeoutException},
+     * which is later
      * mapped to an HTTP 504 Gateway Timeout response by the exception mapper.
      *
      * @param page 1-based page number; null or non-positive returns the first page
-     * @param text text to search for in the headline (case-insensitive substring match; LIKE
-     *     wildcards {@code %} and {@code _} are treated literally)
+     * @param text text to search for in the headline (case-insensitive substring
+     *             match; LIKE
+     *             wildcards {@code %} and {@code _} are treated literally)
      * @param tags list of tags the article must have (case-insensitive)
-     * @return the overview with matching article previews, total count and page info ({@code
-     *     currentPage} is 1-based, matching the request parameter); the preview list is empty when
-     *     nothing matches
+     * @return the overview with matching article previews, total count and page
+     *         info ({@code
+     *     currentPage} is 1-based, matching the request parameter); the preview
+     *         list is empty when
+     *         nothing matches
      * @throws PersistenceException if a database error occurs (including timeout)
      */
     public ArticleOverview searchArticleOverview(Integer page, String text, List<String> tags) {
         int searchPage = Objects.nonNull(page) ? page : 0;
         searchPage = searchPage > 0 ? searchPage - 1 : 0;
         String searchText = Objects.nonNull(text) ? text : "";
-        List<String> searchTags =
-                Objects.nonNull(tags)
-                        ? tags.stream()
-                                .filter(Objects::nonNull)
-                                .filter(t -> !t.isBlank())
-                                .map(String::toLowerCase)
-                                .toList()
-                        : List.of();
+        List<String> searchTags = Objects.nonNull(tags)
+                ? tags.stream()
+                        .filter(Objects::nonNull)
+                        .filter(t -> !t.isBlank())
+                        .map(String::toLowerCase)
+                        .toList()
+                : List.of();
 
         var articleQuery = Article.findByTitleAndTags(searchText, searchTags).page(searchPage, 10);
 
@@ -103,42 +119,49 @@ public class ArticleService {
             articlePreviewList.add(
                     ArticlePreviewMapper.INSTANCE.articleToArticlePreviewDto(article));
         }
-        var result =
-                new ArticleOverview(
-                        articlePreviewList,
-                        articleQuery.count(),
-                        searchPage + 1,
-                        articleQuery.pageCount());
+        var result = new ArticleOverview(
+                articlePreviewList,
+                articleQuery.count(),
+                searchPage + 1,
+                articleQuery.pageCount());
         return result;
     }
 
     /**
-     * Updates the article with the given title (case-insensitive exact match) to the state from the
+     * Updates the article with the given title (case-insensitive exact match) to
+     * the state from the
      * DTO.
      *
-     * <p>The article is looked up by {@code title}; if the DTO carries a different title, the
-     * article is renamed (a title already taken by another article violates the unique index).
-     * Sources are matched by exact URL: unchanged sources keep their id, new ones are created,
-     * missing ones are removed. Tags are resolved case-insensitively by name and reused across
-     * articles; duplicate names in the DTO (matched case-insensitively) are applied only once.
+     * <p>
+     * The article is looked up by {@code title}; if the DTO carries a different
+     * title, the
+     * article is renamed (a title already taken by another article violates the
+     * unique index).
+     * Sources are matched by exact URL: unchanged sources keep their id, new ones
+     * are created,
+     * missing ones are removed. Tags are resolved case-insensitively by name and
+     * reused across
+     * articles; duplicate names in the DTO (matched case-insensitively) are applied
+     * only once.
      *
-     * <p>Runs in its own transaction. Database query timeouts are propagated as {@link
-     * QueryTimeoutException}, which is later mapped to an HTTP 504 Gateway Timeout response by the
+     * <p>
+     * Runs in its own transaction. Database query timeouts are propagated as {@link
+     * QueryTimeoutException}, which is later mapped to an HTTP 504 Gateway Timeout
+     * response by the
      * exception mapper.
      *
      * @param articleDto new state of the article
-     * @param title exact title of the article to update, matched case-insensitively
+     * @param title      exact title of the article to update, matched
+     *                   case-insensitively
      * @return the updated article as DTO
-     * @throws NotFoundException if no article exists with the given title
+     * @throws NotFoundException    if no article exists with the given title
      * @throws PersistenceException if a database error occurs (including timeout)
      */
     @Transactional
     public ArticleDto editArticle(ArticleDto articleDto, String title) {
-        var article =
-                Article.findByTitleOptional(title)
-                        .orElseThrow(() ->
-                                new NotFoundException(
-                                        "Article with title: " + title + " not found"));
+        var article = Article.findByTitleOptional(title)
+                .orElseThrow(() -> new NotFoundException(
+                        "Article with title: " + title + " not found"));
 
         article.title = articleDto.title();
         article.logoUrl = articleDto.logoUrl();
@@ -158,11 +181,10 @@ public class ArticleService {
         // collection is never mutated while a stream over it is still in progress.
         var newSources = new LinkedList<Source>();
         for (var sourceDto : articleDto.sources()) {
-            var existingSource =
-                    article.sources.stream()
-                            .filter(s -> s.url.equals(sourceDto.url()))
-                            .findFirst()
-                            .orElse(null);
+            var existingSource = article.sources.stream()
+                    .filter(s -> s.url.equals(sourceDto.url()))
+                    .findFirst()
+                    .orElse(null);
             if (Objects.isNull(existingSource)) {
                 existingSource = SourceMapper.INSTANCE.sourceDtoToSource(sourceDto);
                 existingSource.article = article;
@@ -176,20 +198,18 @@ public class ArticleService {
 
     private void editArticleTags(Article article, ArticleDto articleDto) {
         article.tags.clear();
-        var distinctTagDtos =
-                articleDto.tags().stream()
-                        .filter(tagDto -> Objects.nonNull(tagDto.name()))
-                        .collect(
-                                Collectors.toMap(
-                                        tagDto -> tagDto.name().toLowerCase(),
-                                        tagDto -> tagDto,
-                                        (first, duplicate) -> first,
-                                        LinkedHashMap::new))
-                        .values();
+        var distinctTagDtos = articleDto.tags().stream()
+                .filter(tagDto -> Objects.nonNull(tagDto.name()))
+                .collect(
+                        Collectors.toMap(
+                                tagDto -> tagDto.name().toLowerCase(),
+                                tagDto -> tagDto,
+                                (first, duplicate) -> first,
+                                LinkedHashMap::new))
+                .values();
         for (var tagDto : distinctTagDtos) {
-            var tag =
-                    Tag.findByNameOptional(tagDto.name())
-                            .orElseGet(() -> TagMapper.INSTANCE.tagDtoToTag(tagDto));
+            var tag = Tag.findByNameOptional(tagDto.name())
+                    .orElseGet(() -> TagMapper.INSTANCE.tagDtoToTag(tagDto));
             article.tags.add(tag);
         }
     }
@@ -197,8 +217,10 @@ public class ArticleService {
     /**
      * Deletes the article with the given title (case-insensitive exact match).
      *
-     * <p>Runs in its own transaction. Database query timeouts are propagated as {@link
-     * QueryTimeoutException}, which is later mapped to an HTTP 504 Gateway Timeout response by the
+     * <p>
+     * Runs in its own transaction. Database query timeouts are propagated as {@link
+     * QueryTimeoutException}, which is later mapped to an HTTP 504 Gateway Timeout
+     * response by the
      * exception mapper.
      *
      * @param title exact article title, matched case-insensitively
