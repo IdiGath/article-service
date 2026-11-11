@@ -18,7 +18,6 @@ The architecture is documented following the arc42 template in [docs/architectur
 - **Article deletion** by exact title match (case-insensitive)
 - **Article update** by exact title match (case-insensitive)
 - **REST API** for content access
-- TODO **Create operation** (POST /api/articles is still a stub)
 - TODO **AI-powered article classification and spell-checking** (on article creation via POST: auto-suggest tags/categories from content, check spelling without altering writing style)
 - TODO **Markdown-to-HTML parsing** (converts stored Markdown to HTML before returning it to the client)
 - TODO **Container image build** (wire up the generated Dockerfiles in `src/main/docker/` with make targets and documentation)
