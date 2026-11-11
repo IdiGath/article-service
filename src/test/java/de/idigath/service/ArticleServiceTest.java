@@ -386,4 +386,55 @@ public class ArticleServiceTest {
         assertThat(Source.count("url = ?1", "https://example.com/new")).isEqualTo(1);
         assertThat(Source.count("url = ?1", "https://example.com/old")).isEqualTo(1);
     }
+
+    @Test
+    @TestTransaction
+    void addNewArticle_validDto_persistsArticleWithSourceAndTag() {
+        var dto =
+                new ArticleDto(
+                        "Brand new article",
+                        "https://example.com/logo.png",
+                        "Summary",
+                        "Text content",
+                        null,
+                        null,
+                        new HashSet<>(
+                                Set.of(new SourceDto("Source", "https://example.com/src", "citation"))),
+                        new HashSet<>(Set.of(new TagDto("NewTag"))));
+
+        var result = articleService.addNewArticle(dto);
+
+        assertThat(result.title()).isEqualTo("Brand new article");
+        assertThat(result.createdAt()).isNotNull();
+        assertThat(result.updatedAt()).isNotNull();
+        assertThat(result.sources()).hasSize(1);
+        assertThat(result.tags()).hasSize(1);
+        assertThat(Article.count("lower(title) = lower(?1)", "Brand new article")).isEqualTo(1);
+        assertThat(Source.count("url = ?1", "https://example.com/src")).isEqualTo(1);
+        assertThat(Tag.count("lower(name) = lower(?1)", "NewTag")).isEqualTo(1);
+    }
+
+    @Test
+    @TestTransaction
+    void addNewArticle_tagNameAlreadyExistsDifferentCase_reusesTagWithoutDuplicate() {
+        var existingTag = new Tag();
+        existingTag.name = "ReuseTag";
+        existingTag.persist();
+        var dto =
+                new ArticleDto(
+                        "Tag reuse article",
+                        "https://example.com/logo.png",
+                        "Summary",
+                        "Text content",
+                        null,
+                        null,
+                        new HashSet<SourceDto>(),
+                        new HashSet<>(Set.of(new TagDto("reusetag"))));
+
+        var result = articleService.addNewArticle(dto);
+
+        assertThat(result.tags()).hasSize(1);
+        assertThat(result.tags().iterator().next().name()).isEqualToIgnoringCase("reusetag");
+        assertThat(Tag.count("lower(name) = lower(?1)", "reusetag")).isEqualTo(1);
+    }
 }

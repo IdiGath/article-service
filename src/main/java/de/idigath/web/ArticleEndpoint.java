@@ -17,6 +17,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
+
 import java.net.URI;
 import java.time.ZoneId;
 import java.util.Date;
@@ -74,21 +75,21 @@ public class ArticleEndpoint {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Operation(summary = "Create an article", description = "Currently a stub: responds 201 with a hardcoded Location header; "
-            + "the article is not persisted yet.")
+    @Operation(summary = "Create an article", description = "Persists a new article. Responds 201 with the created article in the body "
+            + "and a Location header pointing to it. Tags are matched case-insensitively by name and reused across articles.")
     @APIResponses({
-            @APIResponse(responseCode = "201", description = "Article created; Location header points to it"),
+            @APIResponse(responseCode = "201", description = "Article created; Location header points to it", content = @Content(schema = @Schema(implementation = ArticleDto.class))),
             @APIResponse(responseCode = "400", description = "Malformed request body or failed validation; response body lists the invalid fields"),
             @APIResponse(responseCode = "504", description = "Database query timeout", content = @Content(mediaType = "text/plain"))
     })
-    public RestResponse<Void> addArticle(
-            @Parameter(description = "New article payload") @Valid ArticleDto article,
+    public RestResponse<ArticleDto> addNewArticle(
+            @Parameter(description = "New article payload") @Valid ArticleDto newArticle,
             @Context UriInfo uriinfo) {
-        // TODO: Implement full CRUD — save article to DB
         // TODO: AI integration — classify article (auto-tags/categories)
         // and spell-check without altering writing style before saving
-        URI location = uriinfo.getAbsolutePathBuilder().path("42").build();
-        return RestResponse.created(location);
+        var result = articleService.addNewArticle(newArticle);
+        URI location = uriinfo.getAbsolutePathBuilder().path(result.title()).build();
+        return RestResponse.ResponseBuilder.<ArticleDto>created(location).entity(result).build();
     }
 
     @DELETE

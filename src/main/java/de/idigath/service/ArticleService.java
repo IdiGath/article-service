@@ -169,7 +169,7 @@ public class ArticleService {
         article.textContent = articleDto.textContent();
 
         editArticleSources(article, articleDto);
-        editArticleTags(article, articleDto);
+        setArticleTags(article, articleDto);
         Article.flush();
         return ArticleMapper.INSTANCE.articleToArticleDto(article);
     }
@@ -196,7 +196,7 @@ public class ArticleService {
         article.sources.addAll(newSources);
     }
 
-    private void editArticleTags(Article article, ArticleDto articleDto) {
+    private void setArticleTags(Article article, ArticleDto articleDto) {
         article.tags.clear();
         var distinctTagDtos = articleDto.tags().stream()
                 .filter(tagDto -> Objects.nonNull(tagDto.name()))
@@ -230,5 +230,31 @@ public class ArticleService {
     @Transactional
     public long deleteArticleByTitle(String title) {
         return Article.deleteByTitle(title);
+    }
+
+    /**
+     * Persists a new article from the given DTO.
+     *
+     * <p>Sources are linked back to the article (the owning side of the relationship, which the
+     * mapper ignores). Tags are resolved case-insensitively by name and reused across articles;
+     * duplicate names in the DTO (matched case-insensitively) are applied only once, so the unique
+     * constraint on {@code tags.name} is never violated.
+     *
+     * <p>Runs in its own transaction. Database query timeouts are propagated as {@link
+     * QueryTimeoutException}, which is later mapped to an HTTP 504 Gateway Timeout response by the
+     * exception mapper.
+     *
+     * @param newArticleDto new article payload
+     * @return the persisted article as DTO, including server-generated id and timestamps
+     * @throws PersistenceException if a database error occurs (including timeout)
+     */
+    @Transactional
+    public ArticleDto addNewArticle(ArticleDto newArticleDto) {
+        var article = ArticleMapper.INSTANCE.articleDtoToArticle(newArticleDto);
+        article.sources.forEach(source -> source.article = article);
+        setArticleTags(article, newArticleDto);
+        article.persist();
+        Article.flush();
+        return ArticleMapper.INSTANCE.articleToArticleDto(article);
     }
 }
