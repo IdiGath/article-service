@@ -30,11 +30,13 @@ public interface ArticleMapper {
     /**
      * Converts an Article DTO to its entity for persistence.
      *
-     * <p>{@code id}, {@code createdAt} and {@code updatedAt} are ignored: they are server-managed
-     * ({@code @CreationTimestamp}/{@code @UpdateTimestamp}) and must never be taken from client
+     * <p>{@code id}, {@code slug}, {@code createdAt} and {@code updatedAt} are ignored: they are
+     * server-managed ({@code slug} is generated from the title on creation, timestamps via
+     * {@code @CreationTimestamp}/{@code @UpdateTimestamp}) and must never be taken from client
      * input.
      */
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "slug", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     Article articleDtoToArticle(ArticleDto articleDto);

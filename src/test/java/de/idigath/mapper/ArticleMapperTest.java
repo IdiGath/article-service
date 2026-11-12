@@ -16,10 +16,11 @@ import org.junit.jupiter.api.Test;
 class ArticleMapperTest {
 
     @Test
-    void articleDtoToArticle_clientSuppliedTimestamps_notMappedToEntity() {
+    void articleDtoToArticle_clientSuppliedServerManagedFields_notMappedToEntity() {
         var dto =
                 new ArticleDto(
                         "Title",
+                        "client-supplied-slug",
                         "https://example.com/logo.png",
                         "Summary",
                         "Text",
@@ -33,6 +34,7 @@ class ArticleMapperTest {
         var entity = ArticleMapper.INSTANCE.articleDtoToArticle(dto);
 
         assertThat(entity.id).isNull();
+        assertThat(entity.slug).isNull();
         assertThat(entity.createdAt).isNull();
         assertThat(entity.updatedAt).isNull();
         assertThat(entity.title).isEqualTo("Title");

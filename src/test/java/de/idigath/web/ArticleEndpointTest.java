@@ -29,27 +29,27 @@ import org.junit.jupiter.api.Test;
 public class ArticleEndpointTest {
 
     @Test
-    void getArticle_existingTitle_returns200() {
-        when().get("/{title}", "NixOS for Java Developers").then().statusCode(200);
+    void getArticle_existingSlug_returns200() {
+        when().get("/{slug}", "nixos-for-java-developers").then().statusCode(200);
     }
 
     @Test
-    void getArticle_nonExistentTitle_returns404() {
-        when().get("/" + "some-nonexistent-article-title").then().statusCode(404);
+    void getArticle_nonExistentSlug_returns404() {
+        when().get("/{slug}", "some-nonexistent-article-slug").then().statusCode(404);
     }
 
     @Test
-    void deleteArticle_existingTitle_returns204AndRemovesArticle() {
+    void deleteArticle_existingSlug_returns204AndRemovesArticle() {
         String title = "Endpoint delete test article";
-        persistTestArticle(title);
+        String slug = persistTestArticle(title);
 
-        when().delete("/{title}", title).then().statusCode(204);
-        when().get("/{title}", title).then().statusCode(404);
+        when().delete("/{slug}", slug).then().statusCode(204);
+        when().get("/{slug}", slug).then().statusCode(404);
     }
 
     @Test
-    void deleteArticle_nonExistentTitle_returns404() {
-        when().delete("/" + "some-nonexistent-article-title").then().statusCode(404);
+    void deleteArticle_nonExistentSlug_returns404() {
+        when().delete("/{slug}", "some-nonexistent-article-slug").then().statusCode(404);
     }
 
     @Test
@@ -121,35 +121,36 @@ public class ArticleEndpointTest {
     }
 
     @Test
-    void editArticle_existingTitle_returns200AndUpdatesArticle() {
+    void editArticle_existingSlug_returns200AndUpdatesArticle() {
         String title = "Endpoint edit test article";
-        persistTestArticle(title);
+        String slug = persistTestArticle(title);
 
         given().contentType(ContentType.JSON)
                 .body(articleJson(title, "Updated summary"))
                 .when()
-                .put("/{title}", title)
+                .put("/{slug}", slug)
                 .then()
                 .statusCode(200)
                 .body("summary", equalTo("Updated summary"))
+                .body("slug", equalTo(slug))
                 .header("Last-Modified", notNullValue());
 
-        when().get("/{title}", title)
+        when().get("/{slug}", slug)
                 .then()
                 .statusCode(200)
                 .body("summary", equalTo("Updated summary"));
 
-        when().delete("/{title}", title).then().statusCode(204);
+        when().delete("/{slug}", slug).then().statusCode(204);
     }
 
     @Test
-    void editArticle_nonExistentTitle_returns404() {
+    void editArticle_nonExistentSlug_returns404() {
         String title = "some-nonexistent-article-title";
 
         given().contentType(ContentType.JSON)
                 .body(articleJson(title, "Summary"))
                 .when()
-                .put("/{title}", title)
+                .put("/{slug}", "some-nonexistent-article-slug")
                 .then()
                 .statusCode(404);
     }
@@ -157,34 +158,34 @@ public class ArticleEndpointTest {
     @Test
     void editArticle_timestampsInRequestBody_returnsServerManagedTimestamps() {
         String title = "Endpoint edit timestamps test article";
-        persistTestArticle(title);
+        String slug = persistTestArticle(title);
 
         String createdAtBefore =
-                when().get("/{title}", title).then().statusCode(200).extract().path("createdAt");
+                when().get("/{slug}", slug).then().statusCode(200).extract().path("createdAt");
 
         String foreignTimestamp = "2000-01-01T00:00:00";
         given().contentType(ContentType.JSON)
                 .body(articleJson(title, "Updated summary", foreignTimestamp))
                 .when()
-                .put("/{title}", title)
+                .put("/{slug}", slug)
                 .then()
                 .statusCode(200)
                 .body("createdAt", equalTo(createdAtBefore))
                 .body("updatedAt", not(equalTo(foreignTimestamp)))
                 .header("Last-Modified", notNullValue());
 
-        when().get("/{title}", title)
+        when().get("/{slug}", slug)
                 .then()
                 .statusCode(200)
                 .body("createdAt", equalTo(createdAtBefore));
 
-        when().delete("/{title}", title).then().statusCode(204);
+        when().delete("/{slug}", slug).then().statusCode(204);
     }
 
     @Test
     void editArticle_missingTitle_returns400AndLeavesArticleUnchanged() {
         String title = "Endpoint validation title test article";
-        persistTestArticle(title);
+        String slug = persistTestArticle(title);
 
         String bodyWithoutTitle =
                 """
@@ -199,45 +200,42 @@ public class ArticleEndpointTest {
         given().contentType(ContentType.JSON)
                 .body(bodyWithoutTitle)
                 .when()
-                .put("/{title}", title)
+                .put("/{slug}", slug)
                 .then()
                 .statusCode(400)
                 .body("errors", hasItem(containsString("title")));
 
-        when().get("/{title}", title)
+        when().get("/{slug}", slug)
                 .then()
                 .statusCode(200)
                 .body("title", equalTo(title))
                 .body("summary", equalTo("Test summary"));
 
-        when().delete("/{title}", title).then().statusCode(204);
+        when().delete("/{slug}", slug).then().statusCode(204);
     }
 
     @Test
     void editArticle_tooLongSummary_returns400AndLeavesArticleUnchanged() {
         String title = "Endpoint validation summary test article";
-        persistTestArticle(title);
+        String slug = persistTestArticle(title);
 
         given().contentType(ContentType.JSON)
                 .body(articleJson(title, "x".repeat(501)))
                 .when()
-                .put("/{title}", title)
+                .put("/{slug}", slug)
                 .then()
                 .statusCode(400)
                 .body("errors", hasItem(containsString("summary")));
 
-        when().get("/{title}", title)
-                .then()
-                .statusCode(200)
-                .body("summary", equalTo("Test summary"));
+        when().get("/{slug}", slug).then().statusCode(200).body("summary", equalTo("Test summary"));
 
-        when().delete("/{title}", title).then().statusCode(204);
+        when().delete("/{slug}", slug).then().statusCode(204);
     }
 
     @Test
     void editArticle_nullSources_returns400() {
         String title = "Endpoint validation sources test article";
-        persistTestArticle(title);
+        String slug = persistTestArticle(title);
 
         String bodyWithoutSources =
                 """
@@ -253,12 +251,12 @@ public class ArticleEndpointTest {
         given().contentType(ContentType.JSON)
                 .body(bodyWithoutSources)
                 .when()
-                .put("/{title}", title)
+                .put("/{slug}", slug)
                 .then()
                 .statusCode(400)
                 .body("errors", hasItem(containsString("sources")));
 
-        when().delete("/{title}", title).then().statusCode(204);
+        when().delete("/{slug}", slug).then().statusCode(204);
     }
 
     @Test
@@ -273,7 +271,7 @@ public class ArticleEndpointTest {
                             .createNativeQuery("LOCK TABLE articles IN ACCESS EXCLUSIVE MODE")
                             .executeUpdate();
 
-                    when().get("/{title}", "NixOS for Java Developers").then().statusCode(504);
+                    when().get("/{slug}", "nixos-for-java-developers").then().statusCode(504);
                 });
     }
 
@@ -314,16 +312,23 @@ public class ArticleEndpointTest {
                 });
     }
 
-    private void persistTestArticle(String title) {
+    private String persistTestArticle(String title) {
+        String slug = slugOf(title);
         QuarkusTransaction.requiringNew()
                 .run(() -> {
                     Article article = new Article();
                     article.title = title;
+                    article.slug = slug;
                     article.logoUrl = "https://example.com/logos/test.png";
                     article.summary = "Test summary";
                     article.textContent = "Test content";
                     article.persist();
                 });
+        return slug;
+    }
+
+    private static String slugOf(String title) {
+        return title.toLowerCase().replaceAll("[^\\p{L}\\p{N}]+", "-").replaceAll("^-+|-+$", "");
     }
 
     private String articleJson(String title, String summary) {

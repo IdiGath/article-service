@@ -29,20 +29,20 @@ public class ArticleServiceTest {
 
     @Test
     @TestTransaction
-    void findArticleByTitle_existingTitleDifferentCase_returnsArticle() {
+    void findArticleBySlug_existingSlug_returnsArticle() {
         String title = "Weekend test article: 100%";
         persistTestArticle(title);
 
-        var result = articleService.findArticleByTitle("weekend test article: 100%");
+        var result = articleService.findArticleBySlug("weekend-test-article-100");
 
         assertThat(result.title()).isEqualTo(title);
     }
 
     @Test
-    void findArticleByTitle_nonExistentTitle_throwsNotFoundException() {
-        assertThatThrownBy(() -> articleService.findArticleByTitle("no such article title"))
+    void findArticleBySlug_nonExistentSlug_throwsNotFoundException() {
+        assertThatThrownBy(() -> articleService.findArticleBySlug("no-such-article-slug"))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("no such article title");
+                .hasMessageContaining("no-such-article-slug");
     }
 
     @Test
@@ -257,6 +257,8 @@ public class ArticleServiceTest {
     private Article persistTestArticle(String title) {
         Article article = new Article();
         article.title = title;
+        article.slug =
+                title.toLowerCase().replaceAll("[^\\p{L}\\p{N}]+", "-").replaceAll("^-+|-+$", "");
         article.logoUrl = "https://example.com/logos/sale.png";
         article.summary = "My test article";
         article.textContent = "My test article";
@@ -265,9 +267,9 @@ public class ArticleServiceTest {
     }
 
     @Test
-    void deleteArticleByTitle_nonExistentTitle_nothingChanged() {
+    void deleteArticleBySlug_nonExistentSlug_nothingChanged() {
         var firstSelect = articleService.searchArticleOverview(null, null, null);
-        articleService.deleteArticleByTitle("dsdfjsdfsdfj");
+        articleService.deleteArticleBySlug("dsdfjsdfsdfj");
         var secondSelect = articleService.searchArticleOverview(null, null, null);
 
         assertThat(secondSelect.totalArticles()).isEqualTo(firstSelect.totalArticles());
@@ -275,11 +277,11 @@ public class ArticleServiceTest {
 
     @Test
     @TestTransaction
-    void deleteArticleByTitle_existingTitle_minusOneArticle() {
+    void deleteArticleBySlug_existingSlug_minusOneArticle() {
         persistTestArticle("Weekend test article: 100%");
         var firstSelect = articleService.searchArticleOverview(null, null, null);
         var expected = firstSelect.totalArticles() - 1;
-        articleService.deleteArticleByTitle("Weekend test article: 100%");
+        articleService.deleteArticleBySlug("weekend-test-article-100");
         var secondSelect = articleService.searchArticleOverview(null, null, null);
 
         assertThat(secondSelect.totalArticles()).isEqualTo(expected);
@@ -294,6 +296,7 @@ public class ArticleServiceTest {
         var articleDto =
                 new ArticleDto(
                         article.title,
+                        null,
                         article.logoUrl,
                         newSummary,
                         article.textContent,
@@ -301,17 +304,18 @@ public class ArticleServiceTest {
                         article.updatedAt,
                         new HashSet<SourceDto>(),
                         new HashSet<TagDto>());
-        var result = articleService.editArticle(articleDto, title);
+        var result = articleService.editArticle(articleDto, article.slug);
         assertThat(newSummary).isEqualTo(result.summary());
     }
 
     @Test
     @TestTransaction
-    void editArticle_notExistingTitle_notFoundException() {
+    void editArticle_notExistingSlug_notFoundException() {
         var title = "Weekend test article: 100%";
         var articleDto =
                 new ArticleDto(
                         title,
+                        null,
                         "url",
                         "Another Summary",
                         "text",
@@ -320,7 +324,7 @@ public class ArticleServiceTest {
                         new HashSet<SourceDto>(),
                         new HashSet<TagDto>());
 
-        assertThatThrownBy(() -> articleService.editArticle(articleDto, title))
+        assertThatThrownBy(() -> articleService.editArticle(articleDto, "no-such-slug"))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -334,6 +338,7 @@ public class ArticleServiceTest {
         var articleDto =
                 new ArticleDto(
                         article.title,
+                        null,
                         article.logoUrl,
                         article.summary,
                         article.textContent,
@@ -342,7 +347,7 @@ public class ArticleServiceTest {
                         new HashSet<SourceDto>(),
                         tags);
 
-        var result = articleService.editArticle(articleDto, title);
+        var result = articleService.editArticle(articleDto, article.slug);
 
         assertThat(result.tags()).hasSize(1);
         assertThat(result.tags().iterator().next().name()).isEqualToIgnoringCase("neu");
@@ -364,6 +369,7 @@ public class ArticleServiceTest {
         var articleDto =
                 new ArticleDto(
                         article.title,
+                        null,
                         article.logoUrl,
                         article.summary,
                         article.textContent,
@@ -378,7 +384,7 @@ public class ArticleServiceTest {
                                         newSourceDto)),
                         new HashSet<TagDto>());
 
-        var result = articleService.editArticle(articleDto, title);
+        var result = articleService.editArticle(articleDto, article.slug);
 
         assertThat(result.sources()).hasSize(2);
         assertThat(result.sources().stream().map(SourceDto::url).toList())
@@ -393,18 +399,22 @@ public class ArticleServiceTest {
         var dto =
                 new ArticleDto(
                         "Brand new article",
+                        null,
                         "https://example.com/logo.png",
                         "Summary",
                         "Text content",
                         null,
                         null,
                         new HashSet<>(
-                                Set.of(new SourceDto("Source", "https://example.com/src", "citation"))),
+                                Set.of(
+                                        new SourceDto(
+                                                "Source", "https://example.com/src", "citation"))),
                         new HashSet<>(Set.of(new TagDto("NewTag"))));
 
         var result = articleService.addNewArticle(dto);
 
         assertThat(result.title()).isEqualTo("Brand new article");
+        assertThat(result.slug()).isEqualTo("brand-new-article");
         assertThat(result.createdAt()).isNotNull();
         assertThat(result.updatedAt()).isNotNull();
         assertThat(result.sources()).hasSize(1);
@@ -423,6 +433,7 @@ public class ArticleServiceTest {
         var dto =
                 new ArticleDto(
                         "Tag reuse article",
+                        null,
                         "https://example.com/logo.png",
                         "Summary",
                         "Text content",
@@ -436,5 +447,33 @@ public class ArticleServiceTest {
         assertThat(result.tags()).hasSize(1);
         assertThat(result.tags().iterator().next().name()).isEqualToIgnoringCase("reusetag");
         assertThat(Tag.count("lower(name) = lower(?1)", "reusetag")).isEqualTo(1);
+    }
+
+    @Test
+    @TestTransaction
+    void addNewArticle_slugCollision_appendsNumericSuffix() {
+        var first = dtoWithTitle("My Title");
+        var second = dtoWithTitle("my-title");
+
+        var firstResult = articleService.addNewArticle(first);
+        var secondResult = articleService.addNewArticle(second);
+
+        assertThat(firstResult.slug()).isEqualTo("my-title");
+        assertThat(secondResult.slug()).isEqualTo("my-title-2");
+        assertThat(Article.count("slug = ?1", "my-title")).isEqualTo(1);
+        assertThat(Article.count("slug = ?1", "my-title-2")).isEqualTo(1);
+    }
+
+    private ArticleDto dtoWithTitle(String title) {
+        return new ArticleDto(
+                title,
+                null,
+                "https://example.com/logo.png",
+                "Summary",
+                "Text content",
+                null,
+                null,
+                new HashSet<SourceDto>(),
+                new HashSet<TagDto>());
     }
 }

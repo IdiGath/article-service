@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Block commits with Spotless format violations.
+# Fix locally with: ./mvnw spotless:apply
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+
+if git diff --cached --name-only --diff-filter=ACM | grep -q '\.java$'; then
+  ./mvnw -B -q spotless:check
+fi

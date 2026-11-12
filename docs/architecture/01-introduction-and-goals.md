@@ -3,8 +3,9 @@
 ## 1.1 Requirements Overview
 
 article-service is a backend REST service for managing blog articles. Articles
-are stored in PostgreSQL as Markdown and exposed via a REST API (get by title,
-search with pagination, delete by title; create and update are stubs). It is
+are stored in PostgreSQL as Markdown and exposed via a REST API (get, create,
+update and delete by slug — the URL-friendly identifier generated from the
+title; search with pagination by text and tags). It is
 the first finished service of a personal blog platform.
 
 ## 1.2 Quality Goals

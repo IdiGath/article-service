@@ -8,7 +8,7 @@
 4. Hibernate validates the schema (`database.generation=validate`) — on mismatch, boot fails
 5. The application listens on `:8080`; Swagger UI is always available
 
-## 6.2 GET `/api/articles/{title}` — read an article
+## 6.2 GET `/api/articles/{slug}` — read an article
 
 ```mermaid
 sequenceDiagram
@@ -16,8 +16,8 @@ sequenceDiagram
     participant EP as ArticleEndpoint
     participant SV as ArticleService
     participant DB as PostgreSQL
-    GW->>EP: GET /api/articles/{title}
-    EP->>SV: findArticleByTitle(title)
+    GW->>EP: GET /api/articles/{slug}
+    EP->>SV: findArticleBySlug(slug)
     SV->>DB: SELECT via Panache (Article)
     DB-->>SV: row
     SV->>SV: MapStruct map entity → ArticleDto
@@ -31,11 +31,13 @@ Gateway → endpoint → `searchArticleOverview(page, text, tags)` → DB query
 (case-insensitive title/text match, AND logic across tags) → `ArticleOverview`
 (list of previews + pagination meta) → 200 JSON.
 
-## 6.4 DELETE `/api/articles/{title}` — delete by exact title
+## 6.4 DELETE `/api/articles/{slug}` — delete by exact slug
 
-Gateway → endpoint → `deleteArticleByTitle(title)` → transactional delete
-(case-insensitive) → response with the number of deleted rows.
+Gateway → endpoint → `deleteArticleBySlug(slug)` → transactional delete → 204,
+or 404 when no article has this slug.
 
 ## 6.5 POST / PUT
 
-Stubs only — no runtime scenario yet (hardcoded responses).
+POST: create article → unique slug generated from the title → 201 + `Location`
+header + `ArticleDto` body. PUT: update by slug (slug never changes) → 200 +
+`Last-Modified` header + `ArticleDto` body.

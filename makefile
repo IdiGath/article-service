@@ -2,7 +2,11 @@
 DEV_TEMPLATE := ./src/main/resources/db/dev/templates/init-dev-user-template.sql
 DEV_OUTPUT := ./src/main/resources/db/dev/target/init-dev-user.sql
 
-.PHONY: generate-dev-sql clean-dev-sql reset-db build dev test
+.PHONY: generate-dev-sql clean-dev-sql reset-db build dev test setup-hooks
+
+# One-time per clone: enable the repo's git hooks (pre-commit runs spotless:check)
+setup-hooks:
+	git config core.hooksPath .githooks
 
 generate-dev-sql:
 	@set -a; \

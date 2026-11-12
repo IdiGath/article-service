@@ -19,11 +19,11 @@ External systems: **PostgreSQL** (JDBC via Hibernate), schema via Liquibase (`db
 
 | Method | Path | Operation | Status |
 |---|---|---|---|
-| GET | `/api/articles/{title}` | article by title → `ArticleDto` | implemented, tested |
+| GET | `/api/articles/{slug}` | article by slug → `ArticleDto` | implemented, tested |
 | GET | `/api/articles/search?page=&text=&tags=` | search + pagination → `ArticleOverview` | implemented, tested |
-| POST | `/api/articles` | create article | stub |
-| PUT | `/api/articles/{title}` | update article (case-insensitive exact title) | implemented, tested |
-| DELETE | `/api/articles/{title}` | delete by exact title (case-insensitive) | implemented, tested |
+| POST | `/api/articles` | create article → 201 + Location + `ArticleDto` body | implemented, tested |
+| PUT | `/api/articles/{slug}` | update article (exact slug; slug is frozen on rename) | implemented, tested |
+| DELETE | `/api/articles/{slug}` | delete by exact slug | implemented, tested |
 
 ## 5.3 Interfaces
 

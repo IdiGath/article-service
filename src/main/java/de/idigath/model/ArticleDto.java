@@ -18,6 +18,7 @@ import java.util.Set;
  */
 public record ArticleDto(
         @NotBlank @Size(max = 255) String title,
+        @JsonProperty(access = Access.READ_ONLY) String slug,
         @NotNull @Size(max = 255) String logoUrl,
         @NotNull @Size(max = 500) String summary,
         @NotNull String textContent,

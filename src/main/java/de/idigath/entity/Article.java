@@ -77,25 +77,25 @@ public class Article extends PanacheEntity {
     }
 
     /**
-     * Finds the article with the given title (case-insensitive exact match).
+     * Finds the article with the given slug (exact match; slugs are stored lowercase).
      *
-     * @param title exact article title, matched case-insensitively
-     * @return an Optional containing the article with the given title, or empty if no article
+     * @param slug exact article slug
+     * @return an Optional containing the article with the given slug, or empty if no article
      *     matches
      */
-    public static Optional<Article> findByTitleOptional(String title) {
-        return find("lower(title) = lower(?1)", title).firstResultOptional();
+    public static Optional<Article> findBySlugOptional(String slug) {
+        return find("slug = ?1", slug).firstResultOptional();
     }
 
     /**
-     * Deletes the article with the given title (case-insensitive exact match). Requires an active
-     * transaction; the transaction boundary is owned by the service layer.
+     * Deletes the article with the given slug (exact match). Requires an active transaction; the
+     * transaction boundary is owned by the service layer.
      *
-     * @param title exact article title, matched case-insensitively
+     * @param slug exact article slug
      * @return 1 if an article was deleted, 0 if no article matches
      */
-    public static long deleteByTitle(String title) {
-        return delete("lower(title) = lower(?1)", title);
+    public static long deleteBySlug(String slug) {
+        return delete("slug = ?1", slug);
     }
 
     /**
@@ -123,6 +123,15 @@ public class Article extends PanacheEntity {
      */
     @Column(length = 255, nullable = false, unique = true)
     public String title;
+
+    /**
+     * URL-friendly unique identifier of the article, used in REST paths as {@code
+     * /api/articles/{slug}}. Generated from the title on creation and frozen afterwards: renaming
+     * the title never changes the slug, so external links stay stable. Uniqueness is enforced by
+     * the {@code uq_articles_slug} index created in the V5 migration.
+     */
+    @Column(length = 255, nullable = false, unique = true)
+    public String slug;
 
     /** Each article has a logo picture. This argument contains the path to the image service */
     @Column(length = 255, nullable = false, name = "logo_url")
